@@ -1,4 +1,8 @@
 import math
+import os
+
+#Notify end of calculations.
+file = "siren.mp3"
 
 #Open files for coordinates, gravity and gravity components.
 #Concider velocity data too.
@@ -218,6 +222,9 @@ while count < time:
     #Increase counters.
     remover = remover + 1
     count = count + resolution
+
+#Done with program.
+os.system("mpg123 " + file)
 
 #################################text-based UI##################################
 #If there was no crash with the planet...
