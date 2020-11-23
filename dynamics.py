@@ -1,8 +1,5 @@
 import math
-import os
-
-#Notify end of calculations.
-file = "siren.mp3"
+from playsound import playsound
 
 #Open files for coordinates, gravity and gravity components.
 #Concider velocity data too.
@@ -130,7 +127,10 @@ v = float(input('Velocity (m/s): '))
 theta = float(input('Angle: '))
 
 #Get the inital velocity components and save into a velocity vector.
-velocity = vcomp(v, theta)
+velocity = ['','']
+inter = vcomp(v, theta)
+velocity[0] = inter[0]
+velocity[1] = inter[1]
 
 #Get the number of points wanted which will be used in the modulo conditional
 #so as to only record data in the .txt files a limited number of times
@@ -224,15 +224,15 @@ while count < time:
     count = count + resolution
 
 #Done with program.
-os.system("mpg123 " + file)
+playsound('siren.mp3')
 
 #################################text-based UI##################################
 #If there was no crash with the planet...
 if error == False:
 
     print("\n****************************************************************")
-    print('x factor velocity: ', str(vx))
-    print('y factor velocity: ', str(vy),"\n")
+    print('x factor velocity: ', str(velocity[0]))
+    print('y factor velocity: ', str(velocity[1]),"\n")
     print('Initial acceleration parameters')
     print(acomp(satellite_A[3],satellite_A[4],moon))
     print("Max Gs: " + str(satellite_A[7]))
