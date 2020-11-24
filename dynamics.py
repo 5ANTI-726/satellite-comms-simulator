@@ -249,6 +249,7 @@ else:
     print("There goes the neighborhood")
     print("Max Gs: " + str(satellite_A[7]))
     print("Crashed after: " + str(count) + " seconds.")
+    print("Menu: vx, vy, 'initial acomp', quit")
     print("****************************************************************")
 
     #Allow for data retention of last velocity components
