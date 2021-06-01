@@ -1,163 +1,160 @@
+
 import math
 from playsound import playsound
 
-#Open files for coordinates, gravity and gravity components.
-#Concider velocity data too.
-coo = open("coordinates.txt", "w+")
-gs = open("gs.txt", "w+")
-xgs = open("xgs.txt", "w+")
-ygs = open("ygs.txt", "w+")
-vx = open("vx.txt", "w+")
-vy = open("vy.txt", "w+")
-dr = open("r.txt", "w+")
-area1 = open("area1.txt", "w+")
-area2 = open("area2.txt", "w+")
+#¿Qué queremos guardar? Queremos velocidades, distancia del centro,
+#energía cinética/potencial, coordenadas y momento total. Son 12 archivos.
+co1 = open("coordinates1.txt", "w+")
+co2 = open("coordinates2.txt", "w+")
+vx1 = open("vx1.txt", "w+")
+vy1 = open("vy1.txt", "w+")
+vz1 = open("vz1.txt", "w+")
+vx2 = open("vx2.txt", "w+")
+vy2 = open("vy2.txt", "w+")
+vz2 = open("vz2.txt", "w+")
+radio1 = open("r1.txt", "w+")
+radio2 = open("r2.txt", "w+")
+T = open("cinetica.txt", "w+")
+U = open("potencial.txt", "w+")
+P = open("momento.txt", "w+")
+H = open("hamilton.txt", "w+")
 
 #Get initial velocity and orientation.
 #Concider giving heading in terms of an angle or a different point in space.
 
-def vcomp(v,theta):
+def vcomp(v,theta,phi):
     #No idea which is more expensive...
-    x = abs(v)*math.cos(theta)
-    y = math.sqrt(math.pow(v,2)-math.pow(x,2))
-    return round(x,6), round(y,6)
+    x = abs(v)*math.cos(theta)*math.sin(phi)
+    y = abs(v)*math.sin(theta)*math.sin(phi)
+    z = abs(v)*math.cos(phi)
+    return round(x,6), round(y,6), round(y,6)
 
-#Get the acceleration component at any point in space with
-#respect to a static point (0,0) and using the normal
-#gravitational constant and earth mass.
+#Check to see if the coordinates of any two objects are closer
+#than their radii allow.
+def crash(all_bodies):
+    status = False
 
-#I will eventually allow for a moving earth and have to create separate methods
-#for the accelerations from different bodies. Another option is giving the name
-#of the body (e.g. moon, earth, sun) and selecting and appropriate submethod.
-def acomp(x,y,count,ok):
-    #acceleration for bodies
-    moon = ''
-    if moon == 'body':
-        gravc = 6.67408*math.pow(10,-11)
-        massearth = 5.972*math.pow(10,24)
-        d = math.sqrt(math.pow(x,2)+math.pow(y,2))
+    for i in range(0,len(all_bodies)-1):
+        for k in range(i+1,len(all_bodies)-1):
+                cum_r = (all_bodies[i].radio + all_bodies[k].radio)
+            if cum_r <= all_bodies[i].distancia(all_bodies[k]):
+                status = True
 
-        #Calculate the components
-        a = gravc*massearth/math.pow(d,2)
-        if x == 0:
-            ax = 0
-            ay = -a*y/abs(y)
-        if y == 0:
-            ax = -a*x/abs(x)
-            ay = 0
+    return status
+
+def escribir2(archivo,c,d):
+    archivo.write('('+str(c)+','+str(d)+')')
+    archivo.write("\n")
+def escribir3(archivo,e,f,g):
+    archivo.write('('+str(e)+','+str(f)+','+str(g)')')
+    archivo.write("\n")
+
+
+###########################cuerpos###########################
+class Cuerpo:
+    c_grav = 6.67408*math.pow(10,-11)
+    def __init__(self, nombre, masa, pos, vel):
+        self.nombre = nombre #1
+        self.masa = masa     #2
+        self.pos[0] = x_pos   #3
+        self.pos[1] = y_pos   #4
+        self.pos[2] = z_pos   #5
+        self.vel[0] = x_vel   #6
+        self.vel[1] = y_vel   #7
+        self.vel[2] = z_vel   #8
+    def asignacion(self):
+        #Asignación de valores del cuerpo
+        self.x_pos = input("Posición en x: ")
+        self.y_pos = input("Posición en y: ")
+        self.z_pos = input("Posición en z: ")
+        #Velocidad con ángulos o velocidades
+        choice = input("Velocidad a través de ángulos o velocidades")
+        if choice == "velocidades":
+            self.x_vel = input("Velocidad en x: ")
+            self.y_vel = input("Velocidad en y: ")
+            self.z_vel = input("Velocidad en z: ")
         else:
-            ax = -a*x/d
-            ay = -a*y/d
+            vel = input("Velocidad en x: ")
+            theta = input("Ángulo theta: ")
+            phi = input("Ángulo phi: ")
+            v = vcomp(v,theta,phi)
+            self.x_vel = v[0]
+            self.y_vel = v[1]
+            self.z_vel = v[2]
+    def fuerza(self,otro):
+        d = self.distancia(otro)
+        x = self.pos[0]-otro.pos[0]
+        y = self.pos[1]-otro.pos[1]
+        z = self.pos[2]-otro.pos[2]
 
-        g = a/9.81964973772
-        return(float(a),float(ax),float(ay),float(g))
+        f = self.c_grav*self.masa*otro.masa/math.pow(d,2)
 
-    #parameters of gravity field
-    else:
-        gravc = 6.67408*math.pow(10,-11)
-        massearth = 5.972*math.pow(10,24)
-        dearth = math.sqrt(math.pow(x,2)+math.pow(y,2))
+        fx = -f*(x)/d
+        fy = -f*(y)/d
+        fz = -f*(z)/d
 
-        #Calculate the components
-        aearth = gravc*massearth/math.pow(dearth,2)
-        if x == 0:
-            axearth = 0
-            ayearth = -aearth*y/abs(y)
-        if y == 0:
-            axearth = -aearth*x/abs(x)
-            ayearth = 0
-        else:
-            axearth = -aearth*x/dearth
-            ayearth = -aearth*y/dearth
+        return(fx,fy,fz)
+    def distancia(self,otro):
+        x = math.pow(self.pos[0] - otro.pos[0],2)
+        y = math.pow(self.pos[1] - otro.pos[1],2)
+        z = math.pow(self.pos[2] - otro.pos[2],2)
 
-        if ok:
-            dr.write('('+str(count)+','+str(dearth)+')')
-            dr.write("\n")
+        d = math.sqrt(x+y+z)
 
-        a = aearth
-        ax = axearth
-        ay = ayearth
+        return(d)
 
-        return(a,ax,ay,g)
 
-#Check to see if the coordinates of the object are within the earth
-#according a radius of 6,371,000 meters. This would mean collision.
-def Inside(x,y):
-    if math.sqrt(math.pow(x,2) + math.pow(y,2)) <= 6371000:
-        return True
-    else:
-        return False
+
+A = Cuerpo('Tierra',5.9736*math.pow(10,24),[0,0,0],
+[0,0,0])
+B = Cuerpo('Luna',7.34767*math.pow(10,21),[406700000,0,100000],
+[970,0,-20])
+#Activar para asignar parámetros. Si no, dejar valores existentes.
+#A.asignacion()
+#B.asignacion()
+
+#Estructura de datos por si a caso.
+all_bodies = [A,B]
 
 #########################input and resolve parameters###########################
 
 print('****************************************************************')
 
-#Parameters: ['name',x-position, y-position, initial-x velocity,
-#initial-y velocity, max-g-coordinates, max-g].
-satellite_A = ['sat_a',0,0,0,0,0,0,0]
-
-#Defining the variables of the moon: Located at 'right' of the earth and at
-#apogee (with it's lowest speed)
-#Parameters: ['x-position', 'y-position', ???, ???]
-moon = [4.067*math.pow(10,8),0,0,970]
-
-#Get the initial x and y positions.
-satellite_A[1] = float(input('x coordinates: '))
-satellite_A[2] = float(input('y coordinates: '))
-satellite_A[3] = satellite_A[1]
-satellite_A[4] = satellite_A[2]
+#Get the number of points wanted which will be used in the modulo conditional
+#so as to only record data in the .txt files a limited number of times
+#for even the largest trajectories.
+points = float(input('Número de puntos por guardar: '))
 
 ok = False
 
 #Write down the initial position, gravity and gravity components.
-coo.write('('+str(satellite_A[3])+','+str(satellite_A[4])+')')
-coo.write("\n")
-gs.write('('+str(0)+','+str(acomp(satellite_A[3],satellite_A[4],0,ok)[0])+')')
-gs.write("\n")
-xgs.write("("+str(0)+","+str(acomp(satellite_A[3],satellite_A[4],0,ok)[1])+")")
-xgs.write("\n")
-ygs.write('('+str(0)+','+str(acomp(satellite_A[3],satellite_A[4],0,ok)[2])+')')
-ygs.write("\n")
+escribir3(co1,A.pos[0],A.pos[1],A.pos[2])
+escribir3(co2,B.pos[0],B.pos[1],B.pos[2])
 
-#Get the initial velocity and angle.
-v = float(input('Velocity (m/s): '))
-theta = float(input('Angle: '))
-
-#Get the inital velocity components and save into a velocity vector.
-velocity = ['','']
-inter = vcomp(v, theta)
-velocity[0] = inter[0]
-velocity[1] = inter[1]
-
-#Get the number of points wanted which will be used in the modulo conditional
-#so as to only record data in the .txt files a limited number of times
-#for even the largest trajectories.
-points = float(input('Number of points: '))
-
-#Resolution of calculations. Here we have the drift of the satellite
-#according to the resolution.
-##acceleration error of -2.07184969376e-5 (m/s^2) per second, resolution of 5
-##acceleration error of -4.65279355e-7 (m/s^2) per second, resolution of 0.1
-##acceleration error of -4.66440071e-8 (m/s^2) per second, resolution of 0.01
-##acceleration error of -4.67268049e-9 (m/s^2) per second, resolution of 0.001
-resolution = float(input('Time resolution: '))
+#Resolution of calculations (∆t).
+resolution = float(input('Resolución de tiempo: '))
 
 #Simulation length in seconds.
-time = float(input('Clock: '))
+time = float(input('Tiempo de simulación: '))
 
-#Establishing stores for the maximum acceleration observed, in g's,
-#the coordinantes for the max g, the error (crash) variable that inidicates
+#Establishing stores for the error (crash) variable that inidicates
 #if a crash ocurred, the frequency of writing down coordinates in terms
-#of points skipped (espacio), and the control variables.
+#of points skipped, and the control variables.
 
 error = False
+frecuencia_escribir = round(time/points/resolution)
 remover = 0
 count = 0
-espacio = round(time/points/resolution)
 
-accsuite = acomp(satellite_A[1],satellite_A[2],0,True)
-velocity[0] = velocity[0] + 0.5*resolution*accsuite[1]
-velocity[1] = velocity[1] + 0.5*resolution*accsuite[2]
+#Get the first velocities ready for the leapfrog method.
+all_vel =
+[[A.vel[0],A.vel[1],A.vel[2]]
+,[B.vel[0],B.vel[1],B.vel[2]]]
+
+#Establecemos velocity vertlett con medio paso de Euler para t + ∆t/2.
+A.vel[0]
+
+A.vel[0]A.fuerza(B,A.distancia(B))/A.masa
 
 ar1 = 0
 ar2 = 0
