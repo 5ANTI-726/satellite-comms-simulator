@@ -102,8 +102,10 @@ def momento_lineal_comp(all_bodies,i):
     Pi = 0
     for k in range(0,len(all_bodies)):
         Pi += all_bodies[k].vel[i]*all_bodies[k].masa
-
-    return(Pi)
+    if i != 1:
+        return(Pi)
+    else:
+        return(Pi*math.pow(10,-24))
 
 #Momento angular total.
 #def momento_angular(all_bodies):
@@ -158,22 +160,22 @@ class Cuerpo:
         self.vel = velocity   #5
     def asignacion(self):
         #Asignación del radio del cuerpo
-        self.radio = input("Radio del cuerpo: ")
+        self.radio = input("Radio del cuerpo, " + str(self.nombre) + ": ")
         #Asignación de valores del cuerpo
         self.x_pos = input("Posición en x: ")
         self.y_pos = input("Posición en y: ")
         self.z_pos = input("Posición en z: ")
         #Velocidad con ángulos o velocidades
-        choice = input("Velocidad a través de ángulos o velocidades")
+        choice = input("Velocidad a través de ángulos o velocidades? ")
         if choice == "velocidades":
             self.x_vel = input("Velocidad en x: ")
             self.y_vel = input("Velocidad en y: ")
             self.z_vel = input("Velocidad en z: ")
         else:
-            vel = input("Velocidad en x: ")
+            vel = input("Velocidad: ")
             theta = input("Ángulo theta: ")
             phi = input("Ángulo phi: ")
-            v = vcomp(v,theta,phi)
+            v = vcomp(vel,theta,phi)
             self.x_vel = v[0]
             self.y_vel = v[1]
             self.z_vel = v[2]
@@ -204,8 +206,8 @@ A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
 B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[406700000,0,100000],
 [0,970,-20])
 #Activar para asignar parámetros. Si no, dejar valores existentes.
-#A.asignacion()
-#B.asignacion()
+A.asignacion()
+B.asignacion()
 
 #Estructura de datos por si a caso.
 #De echo la usaremos para revisar detectar colisiones entre cualquier cuerpo.
@@ -317,11 +319,6 @@ while count <= time:
     for i in range(0,len(all_bodies)):
         for k in range(0,3):
             all_bodies[i].pos[k] = (all_bodies[i].pos[k]) + delta*(all_bodies[i].vel[k])
-            if i == 1:
-                print(' ')
-                print(str(i),str(k))
-                print(all_bodies[i].vel[k])
-                print(delta*all_bodies[i].vel[k])
 
     #Ahora sí obtenemos la velocidad que corresponde al tiempo actual
     #con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
