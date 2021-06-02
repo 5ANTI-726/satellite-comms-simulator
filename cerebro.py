@@ -109,10 +109,7 @@ def momento_lineal_comp(all_bodies,i):
     Pi = 0
     for k in range(0,len(all_bodies)):
         Pi += all_bodies[k].vel[i]*all_bodies[k].masa
-    if i != 1:
-        return(Pi)
-    else:
-        return(Pi*math.pow(10,-24))
+    return(Pi)
 
 #Momento angular total.
 def momento_angular(all_bodies):
