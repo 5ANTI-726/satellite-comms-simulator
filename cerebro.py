@@ -1,64 +1,64 @@
 import math
 import pandas as pd
-from playsound import playsound
+#from playsound import playsound
 
 #Primero pondremos el método que convierte los archivos .txt a comma
 #separated files (.csv) que se puedan leer en Matlab.
 
 def full_conversion():
-    dataframe1 = pd.read_csv("coordenadas1.txt", header = none)
+    dataframe1 = pd.read_csv("coordenadas1.txt", header = None)
     dataframe1.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
     dataframe1.to_csv('coordenadas1.csv', index = None)
-    dataframe2 = pd.read_csv("coordenadas2.txt", header = none)
+    dataframe2 = pd.read_csv("coordenadas2.txt", header = None)
     dataframe2.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
     dataframe2.to_csv('coordenadas2.csv', index = None)
 
-    dataframe3 = pd.read_csv("vx1.txt", header = none)
+    dataframe3 = pd.read_csv("vx1.txt", header = None)
     dataframe3.columns = ['t (s)', 'Vx (m/s)']
     dataframe3.to_csv('vx1.csv', index = None)
-    dataframe4 = pd.read_csv("vy1.txt", header = none)
+    dataframe4 = pd.read_csv("vy1.txt", header = None)
     dataframe4.columns = ['t (s)', 'Vy (m/s)']
     dataframe4.to_csv('vy1.csv', index = None)
-    dataframe5 = pd.read_csv("vz1.txt", header = none)
+    dataframe5 = pd.read_csv("vz1.txt", header = None)
     dataframe5.columns = ['t (s)', 'Vz (m/s)']
     dataframe5.to_csv('vz1.csv', index = None)
-    dataframe6 = pd.read_csv("vx2.txt", header = none)
+    dataframe6 = pd.read_csv("vx2.txt", header = None)
     dataframe6.columns = ['t (s)', 'Vx (m/s)']
     dataframe6.to_csv('vx2.csv', index = None)
-    dataframe7 = pd.read_csv("vy2.txt", header = none)
+    dataframe7 = pd.read_csv("vy2.txt", header = None)
     dataframe7.columns = ['t (s)', 'Vy (m/s)']
     dataframe7.to_csv('vy2.csv', index = None)
-    dataframe8 = pd.read_csv("vz2.txt", header = none)
+    dataframe8 = pd.read_csv("vz2.txt", header = None)
     dataframe8.columns = ['t (s)', 'Vz (m/s)']
     dataframe8.to_csv('vz2.csv', index = None)
 
-    dataframe9 = pd.read_csv("cinetica.txt", header = none)
+    dataframe9 = pd.read_csv("cinetica.txt", header = None)
     dataframe9.columns = ['t (s)', 'U (J)']
     dataframe9.to_csv('cinetica.csv', index = None)
-    dataframe10 = pd.read_csv("potencial.txt", header = none)
+    dataframe10 = pd.read_csv("potencial.txt", header = None)
     dataframe10.columns = ['t (s)', 'T (J)']
     dataframe10.to_csv('potencial.csv', index = None)
 
-    dataframe11 = pd.read_csv("momento_lineal.txt", header = none)
+    dataframe11 = pd.read_csv("momento_lineal.txt", header = None)
     dataframe11.columns = ['t (s)', 'P (kg*m/s)']
     dataframe11.to_csv('momento_lineal.csv', index = None)
-    dataframe12 = pd.read_csv("momento_lineal_x.txt", header = none)
+    dataframe12 = pd.read_csv("momento_lineal_x.txt", header = None)
     dataframe12.columns = ['t (s)', 'Px (kg*m/s)']
     dataframe12.to_csv('momento_lineal_x.csv', index = None)
-    dataframe13 = pd.read_csv("momento_lineal_y.txt", header = none)
+    dataframe13 = pd.read_csv("momento_lineal_y.txt", header = None)
     dataframe13.columns = ['t (s)', 'Py (kg*m/s)']
     dataframe13.to_csv('momento_lineal_y.csv', index = None)
-    dataframe14 = pd.read_csv("momento_lineal_z.txt", header = none)
+    dataframe14 = pd.read_csv("momento_lineal_z.txt", header = None)
     dataframe14.columns = ['t (s)', 'Pz (kg*m/s)']
     dataframe14.to_csv('momento_lineal_z.csv', index = None)
 
-    dataframe15 = pd.read_csv("momento_angular.txt", header = none)
+    dataframe15 = pd.read_csv("momento_angular.txt", header = None)
     dataframe15.columns = ['t (s)', 'PA (kg*m^2/s)']
     dataframe15.to_csv('momento_angular.csv', index = None)
-    dataframe16 = pd.read_csv("momento_angular_A.txt", header = none)
+    dataframe16 = pd.read_csv("momento_angular_A.txt", header = None)
     dataframe16.columns = ['t (s)', 'PA (kg*m^2/s)']
     dataframe16.to_csv('momento_angular_A.csv', index = None)
-    dataframe17 = pd.read_csv("momento_angular_B.txt", header = none)
+    dataframe17 = pd.read_csv("momento_angular_B.txt", header = None)
     dataframe17.columns = ['t (s)', 'PA (kg*m^2/s)']
     dataframe17.to_csv('momento_angular_B.csv', index = None)
 
@@ -168,18 +168,18 @@ def momento_lineal_comp(all_bodies,i):
         return(Pi*math.pow(10,-24))
 
 #Momento angular total.
-#def momento_angular(all_bodies):
+def momento_angular(all_bodies):
     return(PA)
 #Momento angular del cuerpo con índice j.
-#def momento_angular_i(all_bodies,j):
+def momento_angular_i(all_bodies,j):
     return(PAj)
 
 #Aceptan cualquier tipo de datos y los convierten a tipo string.
 def escribir2(archivo,c,d):
-    archivo.write('('+str(c)+','+str(d)+')')
+    archivo.write(str(c)+','+str(d))
     archivo.write("\n")
 def escribir3(archivo,e,f,g,h):
-    archivo.write('('+str(e)+','+str(f)+','+str(g)+','+str(h)+')')
+    archivo.write(str(e)+','+str(f)+','+str(g)+','+str(h))
     archivo.write("\n")
 #Compilación de todos los datos posibles en un mismo tiempo
 #gracias a que el método es velocity verlett.
@@ -265,8 +265,8 @@ A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
 B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[406700000,0,100000],
 [0,970,-20])
 #Activar para asignar parámetros. Si no, dejar valores existentes.
-A.asignacion()
-B.asignacion()
+#A.asignacion()
+#B.asignacion()
 
 #Estructura de datos por si a caso.
 #De echo la usaremos para revisar detectar colisiones entre cualquier cuerpo.
@@ -429,7 +429,7 @@ if error == False:
 
     print("\n****************************************************************")
     print("Simulation done!!!")
-    playsound('siren.mp3')
+    #playsound('siren.mp3')
     print("****************************************************************")
 
 #If you crashed...
