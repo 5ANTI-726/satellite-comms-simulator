@@ -1,5 +1,66 @@
 import math
+import pandas as pd
 from playsound import playsound
+
+#Primero pondremos el método que convierte los archivos .txt a comma
+#separated files (.csv) que se puedan leer en Matlab.
+
+def full_conversion():
+    dataframe1 = pd.read_csv("coordenadas1.txt", header = none)
+    dataframe1.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
+    dataframe1.to_csv('coordenadas1.csv', index = None)
+    dataframe2 = pd.read_csv("coordenadas2.txt", header = none)
+    dataframe2.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
+    dataframe2.to_csv('coordenadas2.csv', index = None)
+
+    dataframe3 = pd.read_csv("vx1.txt", header = none)
+    dataframe3.columns = ['t (s)', 'Vx (m/s)']
+    dataframe3.to_csv('vx1.csv', index = None)
+    dataframe4 = pd.read_csv("vy1.txt", header = none)
+    dataframe4.columns = ['t (s)', 'Vy (m/s)']
+    dataframe4.to_csv('vy1.csv', index = None)
+    dataframe5 = pd.read_csv("vz1.txt", header = none)
+    dataframe5.columns = ['t (s)', 'Vz (m/s)']
+    dataframe5.to_csv('vz1.csv', index = None)
+    dataframe6 = pd.read_csv("vx2.txt", header = none)
+    dataframe6.columns = ['t (s)', 'Vx (m/s)']
+    dataframe6.to_csv('vx2.csv', index = None)
+    dataframe7 = pd.read_csv("vy2.txt", header = none)
+    dataframe7.columns = ['t (s)', 'Vy (m/s)']
+    dataframe7.to_csv('vy2.csv', index = None)
+    dataframe8 = pd.read_csv("vz2.txt", header = none)
+    dataframe8.columns = ['t (s)', 'Vz (m/s)']
+    dataframe8.to_csv('vz2.csv', index = None)
+
+    dataframe9 = pd.read_csv("cinetica.txt", header = none)
+    dataframe9.columns = ['t (s)', 'U (J)']
+    dataframe9.to_csv('cinetica.csv', index = None)
+    dataframe10 = pd.read_csv("potencial.txt", header = none)
+    dataframe10.columns = ['t (s)', 'T (J)']
+    dataframe10.to_csv('potencial.csv', index = None)
+
+    dataframe11 = pd.read_csv("momento_lineal.txt", header = none)
+    dataframe11.columns = ['t (s)', 'P (kg*m/s)']
+    dataframe11.to_csv('momento_lineal.csv', index = None)
+    dataframe12 = pd.read_csv("momento_lineal_x.txt", header = none)
+    dataframe12.columns = ['t (s)', 'Px (kg*m/s)']
+    dataframe12.to_csv('momento_lineal_x.csv', index = None)
+    dataframe13 = pd.read_csv("momento_lineal_y.txt", header = none)
+    dataframe13.columns = ['t (s)', 'Py (kg*m/s)']
+    dataframe13.to_csv('momento_lineal_y.csv', index = None)
+    dataframe14 = pd.read_csv("momento_lineal_z.txt", header = none)
+    dataframe14.columns = ['t (s)', 'Pz (kg*m/s)']
+    dataframe14.to_csv('momento_lineal_z.csv', index = None)
+
+    dataframe15 = pd.read_csv("momento_angular.txt", header = none)
+    dataframe15.columns = ['t (s)', 'PA (kg*m^2/s)']
+    dataframe15.to_csv('momento_angular.csv', index = None)
+    dataframe16 = pd.read_csv("momento_angular_A.txt", header = none)
+    dataframe16.columns = ['t (s)', 'PA (kg*m^2/s)']
+    dataframe16.to_csv('momento_angular_A.csv', index = None)
+    dataframe17 = pd.read_csv("momento_angular_B.txt", header = none)
+    dataframe17.columns = ['t (s)', 'PA (kg*m^2/s)']
+    dataframe17.to_csv('momento_angular_B.csv', index = None)
 
 #Cuando quieras agregar más cuerpos debes 1) hacer más archivos y
 #agregarlos al método escribir_todo() en la línea 89,
@@ -11,30 +72,29 @@ from playsound import playsound
 
 #¿Qué queremos guardar? Queremos velocidades, distancia del centro,
 #energía cinética/potencial/total, coordenadas, momento lineal total
-#(+componentes) y momento angular después (+componentes).  Son 18 archivos.
+#(+componentes) y momento angular después (+de cada cuerpo).  Son 17 archivos.
 #Coordenadas
-co1 = open("coordenadas1.txt", "w+")
-co2 = open("coordernadas2.txt", "w+")
+co1 = open("coordenadas1.txt", "w+")      #1
+co2 = open("coordenadas2.txt", "w+")     #2
 #Velocidades
-vx1 = open("vx1.txt", "w+")
-vy1 = open("vy1.txt", "w+")
-vz1 = open("vz1.txt", "w+")
-vx2 = open("vx2.txt", "w+")
-vy2 = open("vy2.txt", "w+")
-vz2 = open("vz2.txt", "w+")
+vx1 = open("vx1.txt", "w+")               #3
+vy1 = open("vy1.txt", "w+")               #4
+vz1 = open("vz1.txt", "w+")               #5
+vx2 = open("vx2.txt", "w+")               #6
+vy2 = open("vy2.txt", "w+")               #7
+vz2 = open("vz2.txt", "w+")               #8
 #Energias totales
-T = open("cinetica.txt", "w+")
-U = open("potencial.txt", "w+")
+T = open("cinetica.txt", "w+")            #9
+U = open("potencial.txt", "w+")           #10
 #Momentos lineales
-P = open("momento_lineal.txt", "w+")
-Px = open("momento_lineal_x.txt", "w+")
-Py = open("momento_lineal_y.txt", "w+")
-Pz = open("momento_lineal_z.txt", "w+")
+P = open("momento_lineal.txt", "w+")      #11
+Px = open("momento_lineal_x.txt", "w+")   #12
+Py = open("momento_lineal_y.txt", "w+")   #13
+Pz = open("momento_lineal_z.txt", "w+")   #14
 #Momentos angulares
-PA = open("momento_angular.txt", "w+")
-PAx = open("momento_angular_x.txt", "w+")
-PAy = open("momento_angular_y.txt", "w+")
-PAz = open("momento_angular_z.txt", "w+")
+PA = open("momento_angular.txt", "w+")    #15
+PA_A = open("momento_angular_A.txt", "w+") #16
+PA_B = open("momento_angular_B.txt", "w+") #17
 
 #Get initial velocity and orientation.
 #Concider giving heading in terms of an angle or a different point in space.
@@ -110,9 +170,9 @@ def momento_lineal_comp(all_bodies,i):
 #Momento angular total.
 #def momento_angular(all_bodies):
     return(PA)
-#Momento angular en componente i.
-#def momento_angular_comp(all_bodies,i):
-    return(PAi)
+#Momento angular del cuerpo con índice j.
+#def momento_angular_i(all_bodies,j):
+    return(PAj)
 
 #Aceptan cualquier tipo de datos y los convierten a tipo string.
 def escribir2(archivo,c,d):
@@ -145,9 +205,8 @@ def escribir_todo(A,B,count,delta,all_bodies):
     escribir2(Pz,count+delta,momento_lineal_comp(all_bodies,2))
     #Momentos angulares
     #escribir2(PA,count+delta,momento_angular(all_bodies))
-    #escribir2(PAx,count+delta,momento_angular_comp(all_bodies,0))
-    #escribir2(PAy,count+delta,momento_angular_comp(all_bodies,1))
-    #escribir2(PAz,count+delta,momento_angular_comp(all_bodies,2))
+    #escribir2(PA_A,count+delta,momento_angular_comp(all_bodies,0))
+    #escribir2(PA_B,count+delta,momento_angular_comp(all_bodies,1))
 
 ###########################cuerpos###########################
 class Cuerpo:
