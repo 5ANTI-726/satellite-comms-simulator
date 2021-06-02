@@ -67,7 +67,7 @@ def crash(all_bodies):
     return(status)
 
 #Energía potencial total.
-def potencial(all_bodies):
+def potencial(all_bodies,U0):
     U = 0
     #Limitado a len(...)-2 porque el objeto número
     #all_bodies[len(all_bodies)-1] ya va a haber sido comparado con
@@ -77,10 +77,14 @@ def potencial(all_bodies):
         #quiere repetir el cálculo i-k como k-i. Si los dos empiezan
         #range() en 0, se haran los cálculos "duplicados" i-k y k-i.
         for k in range(i+1,len(all_bodies)):
-            d = all_bodies[i].distancia(all_bodies[k])
-            U = U + all_bodies[i].masa*all_bodies[k].masa/d
+            d = 2*all_bodies[i].distancia(all_bodies[k])
+            U = U + all_bodies[i].c_grav*all_bodies[i].masa*all_bodies[k].masa/d
 
-    return(U)
+    U = U
+    if(U0 == 0):
+        return(U)
+    else:
+        return(U0-U)
 
 #Energía cinética total.
 def cinetica(all_bodies):
@@ -125,7 +129,7 @@ def escribir3(archivo,e,f,g,h):
     archivo.append([e,f,g,h])
 #Compilación de todos los datos posibles en un mismo tiempo
 #gracias a que el método es velocity verlett.
-def escribir_todo(A,B,count,delta,all_bodies):
+def escribir_todo(A,B,count,delta,all_bodies,U0):
     #Coordenadas
     escribir3(co1,A.pos[0],A.pos[1],A.pos[2],count+delta)
     escribir3(co2,B.pos[0],B.pos[1],B.pos[2],count+delta)
@@ -136,10 +140,10 @@ def escribir_todo(A,B,count,delta,all_bodies):
     escribir2(vx2,count+delta,B.vel[0])
     escribir2(vy2,count+delta,B.vel[1])
     escribir2(vz2,count+delta,B.vel[2])
-    #Energía potencial
-    escribir2(e_potencial,count+delta,potencial(all_bodies))
     #Energía cinética
     escribir2(e_cinetica,count+delta,cinetica(all_bodies))
+    #Energía potencial
+    escribir2(e_potencial,count+delta,potencial(all_bodies,U0))
     #Momentos lineales
     escribir2(P,count+delta,momento_lineal(all_bodies))
     escribir2(Px,count+delta,momento_lineal_comp(all_bodies,0))
@@ -203,9 +207,9 @@ class Cuerpo:
         return(d)
 
 A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
-[-1,0,0])
+[0,0,0])
 B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[384.467*math.pow(10,6),0,0],
-[0,970,0])
+[0,670,0])
 
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
@@ -214,6 +218,9 @@ B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[384.467*math.po
 #Estructura de datos por si a caso.
 #De echo la usaremos para revisar detectar colisiones entre cualquier cuerpo.
 all_bodies = [A,B]
+
+#Definimos el potencial al inicio.
+U0 = potencial(all_bodies,0)
 
 #########################input and resolve parameters###########################
 
@@ -259,7 +266,7 @@ count = 0
 #n  A-n  B-n  C-n  D-n  ...  m-n
 
 #Guardamos los valores iniciales (t=0).
-escribir_todo(A,B,count,0,all_bodies)
+escribir_todo(A,B,count,0,all_bodies,U0)
 #Cambios de posición a i(t+∆t) con la F_i(t).
 F = A.fuerza(B)
 #F2 es la fuerza opuesta a F y la que es aplicada el segundo objeto.
@@ -349,7 +356,7 @@ while count <= time:
     #a pos/vel(t+∆t). Quizás tenga que volver a guardar 'todo'
     #después de la última iteración, fuera del loop.
     if remover%frecuencia == 0:
-        escribir_todo(A,B,count,delta,all_bodies)
+        escribir_todo(A,B,count,delta,all_bodies,U0)
     #Increase counters.
     remover = remover + 1
     count = count + delta
@@ -407,10 +414,10 @@ dataframe7.to_csv('/Users/santi/Desktop/Execution environment/vy2.csv', index = 
 dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vz (m/s)'])
 print(dataframe8)
 dataframe8.to_csv('/Users/santi/Desktop/Execution environment/vz2.csv', index = None)
-dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'U (J)'])
+dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'T (J)'])
 print(dataframe9)
 dataframe9.to_csv('/Users/santi/Desktop/Execution environment/cinetica.csv', index = None)
-dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'T (J)'])
+dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
 print(dataframe10)
 dataframe10.to_csv('/Users/santi/Desktop/Execution environment/potencial.csv', index = None)
 dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
