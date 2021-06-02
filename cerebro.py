@@ -1,4 +1,3 @@
-
 import math
 from playsound import playsound
 
@@ -60,26 +59,57 @@ def crash(all_bodies):
 
     return(status)
 
-#Energía cinética total.
-def cinetica(all_bodies):
-    return(T)
-
 #Energía potencial total.
 def potencial(all_bodies):
+    U = 0
+    #Limitado a len(...)-2 porque el objeto número
+    #all_bodies[len(all_bodies)-1] ya va a haber sido comparado con
+    #todos los objetos de indice 0 a len(all_bodies)-1.
+    for i in range(0,len(all_bodies)-2):
+        #Este tipo de algoritmo recursivo empieza range() la k en i si no
+        #quiere repetir el cálculo i-k como k-i. Si los dos empiezan
+        #range() en 0, se haran los cálculos "duplicados" i-k y k-i.
+        for k in range(i+1,len(all_bodies)-1):
+            d = all_bodies[i].distancia(all_bodies[k])
+            U = U + all_bodies[i].masa*all_bodies[k].masa/d
+
     return(U)
+
+#Energía cinética total.
+def cinetica(all_bodies):
+    T = 0
+    for i in range(0,len(all_bodies)-1):
+        vx = all_bodies[m].vel[0]
+        vy = all_bodies[m].vel[1]
+        vz = all_bodies[m].vel[2]
+        v = math.sqrt(math.pow(vx,2)+math.pow(vy,2)+math.pow(vz,2))
+
+        T += 0.5*all_bodies[i].masa*math.pow(v,2)
+
+    return(T)
 
 #Momento lineal total.
 def momento_lineal(all_bodies):
+    P = 0
+    Px = math.pow(momento_lineal_comp(all_bodies,0),2)
+    Py = math.pow(momento_lineal_comp(all_bodies,1),2)
+    Pz = math.pow(momento_lineal_comp(all_bodies,2),2)
+    P = math.sqrt(Px+Py+Pz)
+
     return(P)
 #Momento lineal en componente i.
 def momento_lineal_comp(all_bodies,i):
+    Pi = 0
+    for k in range(0,len(all_bodies)-1):
+        Pi += all_bodies[k].vel[i]*all_bodies[k].masa
+
     return(Pi)
 
 #Momento angular total.
-def momento_angular(all_bodies):
+#def momento_angular(all_bodies):
     return(PA)
 #Momento angular en componente i.
-def momento_angular_comp(all_bodies,i):
+#def momento_angular_comp(all_bodies,i):
     return(PAi)
 
 #Aceptan cualquier tipo de datos y los convierten a tipo string.
@@ -108,11 +138,11 @@ def escribir_todo(A,B,count,delta,all_bodies):
     escribir2(T,count+delta,cinetica(all_bodies))
     #Momentos lineales
     escribir2(P,count+delta,momento_lineal(all_bodies))
-    #escribir2(Px,count+delta,momento_lineal_comp(all_bodies,0))
-    #escribir2(Py,count+delta,momento_lineal_comp(all_bodies,1))
-    #escribir2(Pz,count+delta,momento_lineal_comp(all_bodies,2))
+    escribir2(Px,count+delta,momento_lineal_comp(all_bodies,0))
+    escribir2(Py,count+delta,momento_lineal_comp(all_bodies,1))
+    escribir2(Pz,count+delta,momento_lineal_comp(all_bodies,2))
     #Momentos angulares
-    escribir2(PA,count+delta,momento_angular(all_bodies))
+    #escribir2(PA,count+delta,momento_angular(all_bodies))
     #escribir2(PAx,count+delta,momento_angular_comp(all_bodies,0))
     #escribir2(PAy,count+delta,momento_angular_comp(all_bodies,1))
     #escribir2(PAz,count+delta,momento_angular_comp(all_bodies,2))
@@ -201,17 +231,31 @@ time = float(input('Tiempo de simulación: '))
 #of points skipped, and the control variables.
 error = False
 #Cada cuanto tiempo escribir variables.
-frecuencia = round(time/points/resolution)
+frecuencia = round(time/points/delta)
 remover = 0
-#Tiempo actual.
-count = 0
 
-#Escribimos la primeras posiciones, velocidades, etc.
-escribir_todo(A,B,0,0,all_bodies)
+########Establecemos primer cambio de velocidad y posición.#########
+#Escribimos la primeras posiciones, velocidades, etc. En lugar de un vector
+#de fuerza debería calcular una matriz de todos los vectores de fuerza
+#para cada par única de interacciones y luego invertirlo para la
+#interacción opuesta (F(A-B) = -F(B-A)). Tendría la forma;
+#F   A    B    C    D   ...   m
 
-####Establecemos primer cambio de velocidad y posición.####
-F = A.fuerza(B)
+#A   0   B-A  C-A  D-A  ...  m-A
+
+#B  A-B   0   C-B  D-B  ...  m-B
+
+#C  A-C  B-C   0   D-C  ...  m-C
+
+#D  A-D  B-D  C-D   0   ...  m-D
+
+#.  ...  ...  ...  ...  ...  ...
+
+#n  A-n  B-n  C-n  D-n  ...  m-n
+
+escribir_todo(A,B,count,0,all_bodies)
 #Cambios de posición a i(t+∆t) con la F_i(t).
+F = A.fuerza(B)
 for i in range(0,2):
     A.pos[i] = A.pos[i] + A.vel[i]*delta + (math.pow(delta,2)*F[i]/A.masa)/2
     F[i] = -F[i]
@@ -228,8 +272,8 @@ for i in range(0,2):
 for i in range(0,2):
     B.vel[i] = B.vel[i] + delta*(F[i]/B.masa + F2[i]/B.masa)/2
 
-#Escribimos nuevamente todos los datos, ahora para t = 0+∆t.
-escribir_todo(A,B,0,delta,all_bodies)
+#Tiempo actual.
+count = delta
 
 #Decimales de la ∆t. Permitirá corregir el reloj ya que
 #no siempre se mueve por la cantidad correcta (∆t).
@@ -245,28 +289,60 @@ for i in range(1,101):
     point = round(time*i/100)
     checkin.append(point)
 
-#########################Begin simulation####################################
-while count < time:
+#############################Begin simulation###################################
+while count <= time:
     #Corregir desviaciones del tiempo actual por las decimales de ∆t.
     count = round(count,decimals)
 
-    #Progreso de la simulación.
-    if count in checkin:
-        print(str(100*count/time),"%")
+    #Velocidad intermedia (v(t+0.5*∆t)). Solo se usa para la posición nueva.
+    F = A.fuerza(B)
+    for i in range(0,len(all_bodies)):
+        for k in range(0,2):
+            all_bodies[i].vel[k] = all_bodies[i].vel[k]
+            + delta*(F[k]/all_bodies[i].masa)/2
+            #Fuerzas invertidas para el siguiente objeto.
+            F[k] = -F[k]
 
-    #Revisames el case de colisiones antes de guardar las posiciones y
-    #demás variables ya que no ocurrirían si hubiera una colisión.
+    #Posición nueva en base a la velocidad intermedia (de hace media ∆t).
+    for i in range(0,len(all_bodies)):
+        for k in range(0,2):
+            all_bodies[i].pos[k] = all_bodies[i].pos[k] +
+            delta*(all_bodies[i].vel[k])
+
+    #Ahora sí obtenemos la velocidad que corresponde al tiempo actual
+    #con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
+    F = A.fuerza(B)
+    for i in range(0,len(all_bodies)):
+        for k in range(0,2):
+            all_bodies[i].vel[k] = all_bodies[i].vel[k] +
+            0.5*delta*(F[k]/all_bodies[i].masa)
+            #Fuerzas invertidas para el siguiente objeto.
+            F[k] = -F[k]
+
+
+    #Revisamos el case de colisiones antes de guardar las posiciones y
+    #demás variables ya que no serán  posibles si ocurrió una colisión.
     if crash(all_bodies):
         print("Broke")
         error = True
         break
+
+    #Escribiremos los resultados de la última simulación con el
+    #parámetro de desplacamiento en el tiempo delta ya que corresponden
+    #a pos/vel(t+∆t). Quizás tenga que volver a guardar 'todo'
+    #después de la última iteración.
+    escribir_todo(A,B,count,delta,all_bodies)
 
     #Escribir todos los datos.
     if remover%frecuencia == 0:
         escribir_todo(A,B,count,delta,all_bodies)
     #Increase counters.
     remover = remover + 1
-    count = count + resolution
+    count = count + delta
+
+    #Revisamos el progreso de la simulación.
+    if count in checkin:
+        print(str(100*count/time),"%")
 
 ####Primer caso prueba:
 ####A(r = 0.05,pos[1,0,0],vel[0,0,0])
