@@ -2,66 +2,6 @@ import math
 import pandas as pd
 #from playsound import playsound
 
-#Primero pondremos el método que convierte los archivos .txt a comma
-#separated files (.csv) que se puedan leer en Matlab.
-
-def full_conversion():
-    dataframe1 = pd.read_csv("coordenadas1.txt", header = None)
-    dataframe1.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
-    dataframe1.to_csv('coordenadas1.csv', index = None)
-    dataframe2 = pd.read_csv("coordenadas2.txt", header = None)
-    dataframe2.columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)']
-    dataframe2.to_csv('coordenadas2.csv', index = None)
-
-    dataframe3 = pd.read_csv("vx1.txt", header = None)
-    dataframe3.columns = ['t (s)', 'Vx (m/s)']
-    dataframe3.to_csv('vx1.csv', index = None)
-    dataframe4 = pd.read_csv("vy1.txt", header = None)
-    dataframe4.columns = ['t (s)', 'Vy (m/s)']
-    dataframe4.to_csv('vy1.csv', index = None)
-    dataframe5 = pd.read_csv("vz1.txt", header = None)
-    dataframe5.columns = ['t (s)', 'Vz (m/s)']
-    dataframe5.to_csv('vz1.csv', index = None)
-    dataframe6 = pd.read_csv("vx2.txt", header = None)
-    dataframe6.columns = ['t (s)', 'Vx (m/s)']
-    dataframe6.to_csv('vx2.csv', index = None)
-    dataframe7 = pd.read_csv("vy2.txt", header = None)
-    dataframe7.columns = ['t (s)', 'Vy (m/s)']
-    dataframe7.to_csv('vy2.csv', index = None)
-    dataframe8 = pd.read_csv("vz2.txt", header = None)
-    dataframe8.columns = ['t (s)', 'Vz (m/s)']
-    dataframe8.to_csv('vz2.csv', index = None)
-
-    dataframe9 = pd.read_csv("cinetica.txt", header = None)
-    dataframe9.columns = ['t (s)', 'U (J)']
-    dataframe9.to_csv('cinetica.csv', index = None)
-    dataframe10 = pd.read_csv("potencial.txt", header = None)
-    dataframe10.columns = ['t (s)', 'T (J)']
-    dataframe10.to_csv('potencial.csv', index = None)
-
-    dataframe11 = pd.read_csv("momento_lineal.txt", header = None)
-    dataframe11.columns = ['t (s)', 'P (kg*m/s)']
-    dataframe11.to_csv('momento_lineal.csv', index = None)
-    dataframe12 = pd.read_csv("momento_lineal_x.txt", header = None)
-    dataframe12.columns = ['t (s)', 'Px (kg*m/s)']
-    dataframe12.to_csv('momento_lineal_x.csv', index = None)
-    dataframe13 = pd.read_csv("momento_lineal_y.txt", header = None)
-    dataframe13.columns = ['t (s)', 'Py (kg*m/s)']
-    dataframe13.to_csv('momento_lineal_y.csv', index = None)
-    dataframe14 = pd.read_csv("momento_lineal_z.txt", header = None)
-    dataframe14.columns = ['t (s)', 'Pz (kg*m/s)']
-    dataframe14.to_csv('momento_lineal_z.csv', index = None)
-
-    dataframe15 = pd.read_csv("momento_angular.txt", header = None)
-    dataframe15.columns = ['t (s)', 'PA (kg*m^2/s)']
-    dataframe15.to_csv('momento_angular.csv', index = None)
-    dataframe16 = pd.read_csv("momento_angular_A.txt", header = None)
-    dataframe16.columns = ['t (s)', 'PA (kg*m^2/s)']
-    dataframe16.to_csv('momento_angular_A.csv', index = None)
-    dataframe17 = pd.read_csv("momento_angular_B.txt", header = None)
-    dataframe17.columns = ['t (s)', 'PA (kg*m^2/s)']
-    dataframe17.to_csv('momento_angular_B.csv', index = None)
-
 #Cuando quieras agregar más cuerpos debes 1) hacer más archivos y
 #agregarlos al método escribir_todo() en la línea 89,
 #2) declarar el/los objeto(s) en la línea 172, 3) agregar su referencia
@@ -73,32 +13,39 @@ def full_conversion():
 #¿Qué queremos guardar? Queremos velocidades, distancia del centro,
 #energía cinética/potencial/total, coordenadas, momento lineal total
 #(+componentes) y momento angular después (+de cada cuerpo).  Son 17 archivos.
-#Coordenadas
-co1 = open("coordenadas1.txt", "w+")      #1
-co2 = open("coordenadas2.txt", "w+")     #2
+
+#Primero pondremos el método que convierte los archivos .txt a comma
+#separated files (.csv) que se puedan leer en Matlab.
+
+#Coordenadas 1
+co1 = []
+#Coordenadas 2
+co2 = []
+
 #Velocidades
-vx1 = open("vx1.txt", "w+")               #3
-vy1 = open("vy1.txt", "w+")               #4
-vz1 = open("vz1.txt", "w+")               #5
-vx2 = open("vx2.txt", "w+")               #6
-vy2 = open("vy2.txt", "w+")               #7
-vz2 = open("vz2.txt", "w+")               #8
-#Energias totales
-T = open("cinetica.txt", "w+")            #9
-U = open("potencial.txt", "w+")           #10
+vx1 = []
+vy1 = []
+vz1 = []
+vx2 = []
+vy2 = []
+vz2 = []
+
+#Energías
+e_cinetica = []
+e_potencial = []
+
 #Momentos lineales
-P = open("momento_lineal.txt", "w+")      #11
-Px = open("momento_lineal_x.txt", "w+")   #12
-Py = open("momento_lineal_y.txt", "w+")   #13
-Pz = open("momento_lineal_z.txt", "w+")   #14
+P = []
+Px = []
+Py = []
+Pz = []
+
 #Momentos angulares
 PA = open("momento_angular.txt", "w+")    #15
 PA_A = open("momento_angular_A.txt", "w+") #16
 PA_B = open("momento_angular_B.txt", "w+") #17
 
-#Get initial velocity and orientation.
-#Concider giving heading in terms of an angle or a different point in space.
-
+#Decompose velocity vector.
 def vcomp(v,theta,phi):
     #No idea which is more expensive...
     x = abs(v)*math.cos(theta)*math.sin(phi)
@@ -176,11 +123,9 @@ def momento_angular_i(all_bodies,j):
 
 #Aceptan cualquier tipo de datos y los convierten a tipo string.
 def escribir2(archivo,c,d):
-    archivo.write(str(c)+','+str(d))
-    archivo.write("\n")
+    archivo.append([c,d])
 def escribir3(archivo,e,f,g,h):
-    archivo.write(str(e)+','+str(f)+','+str(g)+','+str(h))
-    archivo.write("\n")
+    archivo.append([e,f,g,h])
 #Compilación de todos los datos posibles en un mismo tiempo
 #gracias a que el método es velocity verlett.
 def escribir_todo(A,B,count,delta,all_bodies):
@@ -195,9 +140,9 @@ def escribir_todo(A,B,count,delta,all_bodies):
     escribir2(vy2,count+delta,B.vel[1])
     escribir2(vz2,count+delta,B.vel[2])
     #Energía potencial
-    escribir2(U,count+delta,potencial(all_bodies))
+    escribir2(e_potencial,count+delta,potencial(all_bodies))
     #Energía cinética
-    escribir2(T,count+delta,cinetica(all_bodies))
+    escribir2(e_cinetica,count+delta,cinetica(all_bodies))
     #Momentos lineales
     escribir2(P,count+delta,momento_lineal(all_bodies))
     escribir2(Px,count+delta,momento_lineal_comp(all_bodies,0))
@@ -439,4 +384,33 @@ else:
     print("Your trajectory was deffective in accuracy")
     print("Crashed after: " + str(count) + " seconds.")
     print("****************************************************************")
-full_conversion()
+
+#Convertir las listas en DataFrames para convertirlos en archivos .csv
+dataframe1 = pd.DataFrame(co1, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+dataframe1.to_csv('coordenadas1.csv', index = None)
+dataframe2 = pd.DataFrame(co2, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+dataframe1.to_csv('coordenadas2.csv', index = None)
+dataframe3 = pd.DataFrame(vx1, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vx1.csv', index = None)
+dataframe4 = pd.DataFrame(vy1, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vy1.csv', index = None)
+dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vz1.csv', index = None)
+dataframe6 = pd.DataFrame(vx2, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vx2.csv', index = None)
+dataframe7 = pd.DataFrame(vy2, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vy2.csv', index = None)
+dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vx (m/s)'])
+dataframe1.to_csv('vz2.csv', index = None)
+dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'U (J)'])
+dataframe1.to_csv('cinetica.csv', index = None)
+dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
+dataframe1.to_csv('potencial.csv', index = None)
+dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
+dataframe1.to_csv('momento_lineal.csv', index = None)
+dataframe12 = pd.DataFrame(Px, columns = ['t (s)', 'P (kg*m/s)'])
+dataframe1.to_csv('momento_lineal_x.csv', index = None)
+dataframe13 = pd.DataFrame(Py, columns = ['t (s)', 'P (kg*m/s)'])
+dataframe1.to_csv('momento_lineal_y.csv', index = None)
+dataframe14 = pd.DataFrame(Pz, columns = ['t (s)', 'P (kg*m/s)'])
+dataframe1.to_csv('momento_lineal_z.csv', index = None)
