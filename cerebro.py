@@ -206,9 +206,10 @@ class Cuerpo:
         return(d)
 
 A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
-[0,0,0])
-B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[406700000,0,100000],
-[0,970,-20])
+[-1,0,0])
+B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[8108.2*math.pow(10,3),0,0],
+[1,0,0])
+
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
 #B.asignacion()
