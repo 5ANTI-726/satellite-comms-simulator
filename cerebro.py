@@ -26,15 +26,15 @@ vz2 = open("vz2.txt", "w+")
 T = open("cinetica.txt", "w+")
 U = open("potencial.txt", "w+")
 #Momentos lineales
-P = open("momento.txt", "w+")
-Px = open("momento.txt", "w+")
-Py = open("momento.txt", "w+")
-Pz = open("momento.txt", "w+")
+P = open("momento_lineal.txt", "w+")
+Px = open("momento_lineal_x.txt", "w+")
+Py = open("momento_lineal_y.txt", "w+")
+Pz = open("momento_lineal_z.txt", "w+")
 #Momentos angulares
 PA = open("momento_angular.txt", "w+")
-PAx = open("momento_angular.txt", "w+")
-PAy = open("momento_angular.txt", "w+")
-PAz = open("momento_angular.txt", "w+")
+PAx = open("momento_angular_x.txt", "w+")
+PAy = open("momento_angular_y.txt", "w+")
+PAz = open("momento_angular_z.txt", "w+")
 
 #Get initial velocity and orientation.
 #Concider giving heading in terms of an angle or a different point in space.
@@ -50,11 +50,11 @@ def vcomp(v,theta,phi):
 #than their radii allow.
 def crash(all_bodies):
     status = False
-
+    cum_r = 0
     for i in range(0,len(all_bodies)-1):
-        for k in range(i+1,len(all_bodies)-1):
-                cum_r = (all_bodies[i].radio + all_bodies[k].radio)
-            if cum_r <= all_bodies[i].distancia(all_bodies[k]):
+        for k in range(i+1,len(all_bodies)):
+            cum_r = (all_bodies[i].radio + all_bodies[k].radio)
+            if cum_r >= all_bodies[i].distancia(all_bodies[k]):
                 status = True
 
     return(status)
@@ -65,11 +65,11 @@ def potencial(all_bodies):
     #Limitado a len(...)-2 porque el objeto número
     #all_bodies[len(all_bodies)-1] ya va a haber sido comparado con
     #todos los objetos de indice 0 a len(all_bodies)-1.
-    for i in range(0,len(all_bodies)-2):
+    for i in range(0,len(all_bodies)-1):
         #Este tipo de algoritmo recursivo empieza range() la k en i si no
         #quiere repetir el cálculo i-k como k-i. Si los dos empiezan
         #range() en 0, se haran los cálculos "duplicados" i-k y k-i.
-        for k in range(i+1,len(all_bodies)-1):
+        for k in range(i+1,len(all_bodies)):
             d = all_bodies[i].distancia(all_bodies[k])
             U = U + all_bodies[i].masa*all_bodies[k].masa/d
 
@@ -78,10 +78,10 @@ def potencial(all_bodies):
 #Energía cinética total.
 def cinetica(all_bodies):
     T = 0
-    for i in range(0,len(all_bodies)-1):
-        vx = all_bodies[m].vel[0]
-        vy = all_bodies[m].vel[1]
-        vz = all_bodies[m].vel[2]
+    for i in range(0,len(all_bodies)):
+        vx = all_bodies[i].vel[0]
+        vy = all_bodies[i].vel[1]
+        vz = all_bodies[i].vel[2]
         v = math.sqrt(math.pow(vx,2)+math.pow(vy,2)+math.pow(vz,2))
 
         T += 0.5*all_bodies[i].masa*math.pow(v,2)
@@ -100,7 +100,7 @@ def momento_lineal(all_bodies):
 #Momento lineal en componente i.
 def momento_lineal_comp(all_bodies,i):
     Pi = 0
-    for k in range(0,len(all_bodies)-1):
+    for k in range(0,len(all_bodies)):
         Pi += all_bodies[k].vel[i]*all_bodies[k].masa
 
     return(Pi)
@@ -116,8 +116,8 @@ def momento_lineal_comp(all_bodies,i):
 def escribir2(archivo,c,d):
     archivo.write('('+str(c)+','+str(d)+')')
     archivo.write("\n")
-def escribir3(archivo,e,f,g):
-    archivo.write('('+str(e)+','+str(f)+','+str(g)')')
+def escribir3(archivo,e,f,g,h):
+    archivo.write('('+str(e)+','+str(f)+','+str(g)+','+str(h)+')')
     archivo.write("\n")
 #Compilación de todos los datos posibles en un mismo tiempo
 #gracias a que el método es velocity verlett.
@@ -202,7 +202,7 @@ class Cuerpo:
 A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
 [0,0,0])
 B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[406700000,0,100000],
-[970,0,-20])
+[0,970,-20])
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
 #B.asignacion()
@@ -233,6 +233,7 @@ error = False
 #Cada cuanto tiempo escribir variables.
 frecuencia = round(time/points/delta)
 remover = 0
+count = 0
 
 ########Establecemos primer cambio de velocidad y posición.#########
 #Escribimos la primeras posiciones, velocidades, etc. En lugar de un vector
@@ -253,27 +254,32 @@ remover = 0
 
 #n  A-n  B-n  C-n  D-n  ...  m-n
 
+#Guardamos los valores iniciales (t=0).
 escribir_todo(A,B,count,0,all_bodies)
 #Cambios de posición a i(t+∆t) con la F_i(t).
 F = A.fuerza(B)
-for i in range(0,2):
+#F2 es la fuerza opuesta a F y la que es aplicada el segundo objeto.
+F2 = [0,0,0]
+for i in range(0,3):
     A.pos[i] = A.pos[i] + A.vel[i]*delta + (math.pow(delta,2)*F[i]/A.masa)/2
-    F[i] = -F[i]
-for i in range(0,2):
-    B.pos[i] = B.pos[i] + B.vel[i]*delta + (math.pow(delta,2)*F[i]/B.masa)/2
-    F[i] = -F[i]
+    F2[i] = -F[i]
+for i in range(0,3):
+    B.pos[i] = B.pos[i] + B.vel[i]*delta + (math.pow(delta,2)*F2[i]/B.masa)/2
 #Cambios de velocidad a v_i(t+∆t) con la F_i(t) y F_i(t+∆t).
 #Esta fuerza más avanzada es calculada con las nuevas posiciones i(t+∆t).
-F2 = A.fuerza(B)
-for i in range(0,2):
-    A.vel[i] = A.vel[i] + delta*(F[i]/A.masa + F2[i]/A.masa)/2
-    F[i] = -F[i]
-    F2[i] = -F2[i]
-for i in range(0,2):
-    B.vel[i] = B.vel[i] + delta*(F[i]/B.masa + F2[i]/B.masa)/2
+F3 = A.fuerza(B)
+F4 = [0,0,0]
+for i in range(0,3):
+    A.vel[i] = A.vel[i] + delta*(F[i]/A.masa + F3[i]/A.masa)/2
+    F4[i] = -F2[i]
+for i in range(0,3):
+    B.vel[i] = B.vel[i] + delta*(F2[i]/B.masa + F4[i]/B.masa)/2
 
-#Tiempo actual.
+#Cambiamos el tiempo porque ya se calcularon las primeras
+#coordenadas/velocidades después del inicio. Tmabién guardamos
+#losnuevos parametros.
 count = delta
+escribir_todo(A,B,count,delta,all_bodies)
 
 #Decimales de la ∆t. Permitirá corregir el reloj ya que
 #no siempre se mueve por la cantidad correcta (∆t).
@@ -296,28 +302,42 @@ while count <= time:
 
     #Velocidad intermedia (v(t+0.5*∆t)). Solo se usa para la posición nueva.
     F = A.fuerza(B)
+    #Creamos una lista que se pueda invertir.
+    F2 = [0,0,0]
+    for i in range(0,3):
+        F2[i] = F[i]
     for i in range(0,len(all_bodies)):
-        for k in range(0,2):
+        for k in range(0,3):
             all_bodies[i].vel[k] = all_bodies[i].vel[k]
-            + delta*(F[k]/all_bodies[i].masa)/2
+            + delta*(F2[k]/all_bodies[i].masa)/2
             #Fuerzas invertidas para el siguiente objeto.
-            F[k] = -F[k]
+            F2[k] = -F2[k]
 
     #Posición nueva en base a la velocidad intermedia (de hace media ∆t).
     for i in range(0,len(all_bodies)):
-        for k in range(0,2):
-            all_bodies[i].pos[k] = all_bodies[i].pos[k] +
-            delta*(all_bodies[i].vel[k])
+        for k in range(0,3):
+            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) + delta*(all_bodies[i].vel[k])
+            if i == 1:
+                print(' ')
+                print(str(i),str(k))
+                print(all_bodies[i].vel[k])
+                print(delta*all_bodies[i].vel[k])
 
     #Ahora sí obtenemos la velocidad que corresponde al tiempo actual
     #con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
     F = A.fuerza(B)
+    F2 = [0,0,0]
+    for i in range(0,3):
+        F2[i] = F[i]
     for i in range(0,len(all_bodies)):
-        for k in range(0,2):
-            all_bodies[i].vel[k] = all_bodies[i].vel[k] +
-            0.5*delta*(F[k]/all_bodies[i].masa)
+        for k in range(0,3):
+            #Por alguna razón si pongo estas expresiones en la ecuación de
+            #forma directa me lee un error de syntax.
+            a = all_bodies[i].vel[k]
+            b = 0.5*delta*(F2[k]/all_bodies[i].masa)
+            all_bodies[i].vel[k] = a + b
             #Fuerzas invertidas para el siguiente objeto.
-            F[k] = -F[k]
+            F2[k] = -F2[k]
 
 
     #Revisamos el case de colisiones antes de guardar las posiciones y
@@ -327,13 +347,10 @@ while count <= time:
         error = True
         break
 
-    #Escribiremos los resultados de la última simulación con el
+    ##Escribiremos los resultados de la última simulación con el
     #parámetro de desplacamiento en el tiempo delta ya que corresponden
     #a pos/vel(t+∆t). Quizás tenga que volver a guardar 'todo'
-    #después de la última iteración.
-    escribir_todo(A,B,count,delta,all_bodies)
-
-    #Escribir todos los datos.
+    #después de la última iteración, fuera del loop.
     if remover%frecuencia == 0:
         escribir_todo(A,B,count,delta,all_bodies)
     #Increase counters.
