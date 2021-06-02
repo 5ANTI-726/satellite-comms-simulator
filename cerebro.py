@@ -282,10 +282,8 @@ for i in range(0,3):
     B.vel[i] = B.vel[i] + delta*(F2[i]/B.masa + F4[i]/B.masa)/2
 
 #Cambiamos el tiempo porque ya se calcularon las primeras
-#coordenadas/velocidades después del inicio. Tmabién guardamos
-#losnuevos parametros.
-count = delta
-escribir_todo(A,B,count,delta,all_bodies)
+#coordenadas/velocidades después del inicio.
+count += delta
 
 #Decimales de la ∆t. Permitirá corregir el reloj ya que
 #no siempre se mueve por la cantidad correcta (∆t).
@@ -301,7 +299,7 @@ for i in range(1,101):
     point = round(time*i/100)
     checkin.append(point)
 
-#############################Begin simulation###################################
+#################################EXECUTION######################################
 while count <= time:
     #Corregir desviaciones del tiempo actual por las decimales de ∆t.
     count = round(count,decimals)
@@ -384,33 +382,48 @@ else:
     print("Your trajectory was deffective in accuracy")
     print("Crashed after: " + str(count) + " seconds.")
     print("****************************************************************")
-
-#Convertir las listas en DataFrames para convertirlos en archivos .csv
+#Para cambir el output location
+#print("File path:") path = input() path = path + "/" + "coordenadas1.csv"
+##Convertir las listas en DataFrames para convertirlos en archivos .csv
 dataframe1 = pd.DataFrame(co1, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
-dataframe1.to_csv('coordenadas1.csv', index = None)
+print(dataframe1)
+dataframe1.to_csv('/Users/santi/Desktop/Execution environment/coordenadas1.csv', index = None)
 dataframe2 = pd.DataFrame(co2, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
-dataframe1.to_csv('coordenadas2.csv', index = None)
+print(dataframe2)
+dataframe2.to_csv('/Users/santi/Desktop/Execution environment/coordenadas2.csv', index = None)
 dataframe3 = pd.DataFrame(vx1, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vx1.csv', index = None)
-dataframe4 = pd.DataFrame(vy1, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vy1.csv', index = None)
-dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vz1.csv', index = None)
+print(dataframe3)
+dataframe3.to_csv('/Users/santi/Desktop/Execution environment/vx1.csv', index = None)
+dataframe4 = pd.DataFrame(vy1, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe4)
+dataframe4.to_csv('/Users/santi/Desktop/Execution environment/vy1.csv', index = None)
+dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe5)
+dataframe5.to_csv('/Users/santi/Desktop/Execution environment/vz1.csv', index = None)
 dataframe6 = pd.DataFrame(vx2, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vx2.csv', index = None)
-dataframe7 = pd.DataFrame(vy2, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vy2.csv', index = None)
-dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vx (m/s)'])
-dataframe1.to_csv('vz2.csv', index = None)
+print(dataframe6)
+dataframe6.to_csv('/Users/santi/Desktop/Execution environment/vx2.csv', index = None)
+dataframe7 = pd.DataFrame(vy2, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe7)
+dataframe7.to_csv('/Users/santi/Desktop/Execution environment/vy2.csv', index = None)
+dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe8)
+dataframe8.to_csv('/Users/santi/Desktop/Execution environment/vz2.csv', index = None)
 dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'U (J)'])
-dataframe1.to_csv('cinetica.csv', index = None)
-dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
-dataframe1.to_csv('potencial.csv', index = None)
+print(dataframe9)
+dataframe9.to_csv('/Users/santi/Desktop/Execution environment/cinetica.csv', index = None)
+dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'T (J)'])
+print(dataframe10)
+dataframe10.to_csv('/Users/santi/Desktop/Execution environment/potencial.csv', index = None)
 dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
-dataframe1.to_csv('momento_lineal.csv', index = None)
-dataframe12 = pd.DataFrame(Px, columns = ['t (s)', 'P (kg*m/s)'])
-dataframe1.to_csv('momento_lineal_x.csv', index = None)
-dataframe13 = pd.DataFrame(Py, columns = ['t (s)', 'P (kg*m/s)'])
-dataframe1.to_csv('momento_lineal_y.csv', index = None)
-dataframe14 = pd.DataFrame(Pz, columns = ['t (s)', 'P (kg*m/s)'])
-dataframe1.to_csv('momento_lineal_z.csv', index = None)
+print(dataframe11)
+dataframe11.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal.csv', index = None)
+dataframe12 = pd.DataFrame(Px, columns = ['t (s)', 'Px (kg*m/s)'])
+print(dataframe12)
+dataframe12.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_x.csv', index = None)
+dataframe13 = pd.DataFrame(Py, columns = ['t (s)', 'Py (kg*m/s)'])
+print(dataframe13)
+dataframe13.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_y.csv', index = None)
+dataframe14 = pd.DataFrame(Pz, columns = ['t (s)', 'Pz (kg*m/s)'])
+print(dataframe14)
+dataframe14.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_z.csv', index = None)
