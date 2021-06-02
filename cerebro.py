@@ -439,3 +439,4 @@ else:
     print("Your trajectory was deffective in accuracy")
     print("Crashed after: " + str(count) + " seconds.")
     print("****************************************************************")
+full_conversion()
