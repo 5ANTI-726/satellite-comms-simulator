@@ -207,9 +207,9 @@ class Cuerpo:
         return(d)
 
 A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
-[0,0,0])
-B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),[384.467*math.pow(10,6),0,0],
-[0,670,0])
+[-120,-40,40])
+B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),
+[104.467*math.pow(10,6),0,0],[0,670,40])
 
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
@@ -325,7 +325,8 @@ while count <= time:
     #Posición nueva en base a la velocidad intermedia (de hace media ∆t).
     for i in range(0,len(all_bodies)):
         for k in range(0,3):
-            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) + delta*(all_bodies[i].vel[k])
+            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) +
+            delta*(all_bodies[i].vel[k])
 
     #Ahora sí obtenemos la velocidad que corresponde al tiempo actual
     #con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
