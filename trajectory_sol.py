@@ -15,14 +15,14 @@ fig = plt.figure()
 ax = p3.Axes3D(fig)
 
 # Reading the data from a CSV file using pandas
-repo = pd.read_csv('coordenadas2.csv',sep=',',header=0)
+repo = pd.read_csv('coordenadas1.csv',sep=',',header=0)
 data = np.array((repo['X (m)'].values, repo['Y (m)'].values, repo['Z (m)'].values))
 print (data.shape[1])
 #exit()
 
 # Creating fifty line objects.
 # NOTE: Can't pass empty arrays into 3d version of plot()
-limit = 100000000
+limit = 1000000000000
 line = ax.plot(data[0, 0:1], data[1, 0:1], data[2, 0:1])[0]
 
 # Setting the axes properties
@@ -32,7 +32,7 @@ ax.set_xlabel('X')
 ax.set_ylim3d([-limit, limit])
 ax.set_ylabel('Y')
 
-ax.set_zlim3d([-limit, limit])
+ax.set_zlim3d([-10000000, 100000000])
 ax.set_zlabel('Z')
 
 ax.set_title('3D Test')

@@ -21,6 +21,8 @@ import pandas as pd
 co1 = []
 #Coordenadas 2
 co2 = []
+#Coordenadas 3
+co3 = []
 
 #Velocidades
 vx1 = []
@@ -29,6 +31,12 @@ vz1 = []
 vx2 = []
 vy2 = []
 vz2 = []
+vx3 = []
+vy3 = []
+vz3 = []
+
+f3_1 = []
+f3_2 = []
 
 #Energías
 e_cinetica = []
@@ -41,9 +49,9 @@ Py = []
 Pz = []
 
 #Momentos angulares
-PA = open("momento_angular.txt", "w+")    #15
-PA_A = open("momento_angular_A.txt", "w+") #16
-PA_B = open("momento_angular_B.txt", "w+") #17
+#PA = open("momento_angular.txt", "w+")    #15
+#PA_A = open("momento_angular_A.txt", "w+") #16
+#PA_B = open("momento_angular_B.txt", "w+") #17
 
 #Decompose velocity vector.
 def vcomp(v,theta,phi):
@@ -80,11 +88,14 @@ def potencial(all_bodies,U0):
             d = 2*all_bodies[i].distancia(all_bodies[k])
             U = U + all_bodies[i].c_grav*all_bodies[i].masa*all_bodies[k].masa/d
 
-    U = U
-    if(U0 == 0):
-        return(U)
-    else:
-        return(U0-U)
+    U = -U
+    return(U)
+
+    #De cuando la energía potencial se tomaba en 0 para condiciones iniciales.
+    #if(U0 == 0):
+        #return(U)
+    #else:
+        #return(U0-U)
 
 #Energía cinética total.
 def cinetica(all_bodies):
@@ -122,7 +133,8 @@ def momento_angular(all_bodies):
 def momento_angular_i(all_bodies,j):
     return(PAj)
 
-#Aceptan cualquier tipo de datos y los convierten a tipo string.
+#Aceptan cualquier tipo de datos y los convierten a tipo string en sus
+#respectivas listas.
 def escribir2(archivo,c,d):
     archivo.append([c,d])
 def escribir3(archivo,e,f,g,h):
@@ -131,19 +143,26 @@ def escribir3(archivo,e,f,g,h):
 #gracias a que el método es velocity verlett.
 def escribir_todo(A,B,count,delta,all_bodies,U0):
     #Coordenadas
-    escribir3(co1,A.pos[0],A.pos[1],A.pos[2],count+delta)
-    escribir3(co2,B.pos[0],B.pos[1],B.pos[2],count+delta)
+    escribir3(co1,all_bodies[0].pos[0],all_bodies[0].pos[1],
+    all_bodies[0].pos[2],count+delta)
+    escribir3(co2,all_bodies[1].pos[0],all_bodies[1].pos[1],
+    all_bodies[1].pos[2],count+delta)
+    escribir3(co3,all_bodies[2].pos[0],all_bodies[2].pos[1],
+    all_bodies[2].pos[2],count+delta)
     #Velocidades
-    escribir2(vx1,count+delta,A.vel[0])
-    escribir2(vy1,count+delta,A.vel[1])
-    escribir2(vz1,count+delta,A.vel[2])
-    escribir2(vx2,count+delta,B.vel[0])
-    escribir2(vy2,count+delta,B.vel[1])
-    escribir2(vz2,count+delta,B.vel[2])
+    escribir2(vx1,count+delta,all_bodies[0].vel[0])
+    escribir2(vy1,count+delta,all_bodies[0].vel[1])
+    escribir2(vz1,count+delta,all_bodies[0].vel[2])
+    escribir2(vx2,count+delta,all_bodies[1].vel[0])
+    escribir2(vy2,count+delta,all_bodies[1].vel[1])
+    escribir2(vz2,count+delta,all_bodies[1].vel[2])
+    escribir2(vx3,count+delta,all_bodies[2].vel[0])
+    escribir2(vy3,count+delta,all_bodies[2].vel[1])
+    escribir2(vz3,count+delta,all_bodies[2].vel[2])
     #Energía cinética
     escribir2(e_cinetica,count+delta,cinetica(all_bodies))
     #Energía potencial
-    escribir2(e_potencial,count+delta,potencial(all_bodies,U0))
+    escribir2(e_potencial,count+delta,potencial(all_bodies,0))
     #Momentos lineales
     escribir2(P,count+delta,momento_lineal(all_bodies))
     escribir2(Px,count+delta,momento_lineal_comp(all_bodies,0))
@@ -154,7 +173,7 @@ def escribir_todo(A,B,count,delta,all_bodies,U0):
     #escribir2(PA_A,count+delta,momento_angular_comp(all_bodies,0))
     #escribir2(PA_B,count+delta,momento_angular_comp(all_bodies,1))
 
-###########################cuerpos###########################
+####################################cuerpos####################################
 class Cuerpo:
     c_grav = 6.67408*math.pow(10,-11)
     def __init__(self, nombre, radio, masa, position, velocity):
@@ -206,21 +225,27 @@ class Cuerpo:
 
         return(d)
 
-A = Cuerpo('Tierra',6371*math.pow(10,3),5.9736*math.pow(10,24),[0,0,0],
-[-120,-40,40])
-B = Cuerpo('Luna',1737.1*math.pow(10,3),7.34767*math.pow(10,21),
-[104.467*math.pow(10,6),0,0],[0,670,40])
+#(nombre, radio, masa, posición [x,y,z], velocidad [vx,vy,vz])
+A = Cuerpo('Sol',696.34*math.pow(10,6),1.989*math.pow(10,30),
+[0,0,0],[0,0,200])
+B = Cuerpo('Júpiter',69.911*math.pow(10,6),1.898*math.pow(10,27),
+[755.23*math.pow(10,9),0,0],[0,10000,200])
+#Densidad típica de 4 g/cm, radio de 500 metros y masa de
+#2.094*math.pow(10,12) kg
+C = Cuerpo('Asteroide',500,2.094*math.pow(10,12),
+[755.33*math.pow(10,9),0,0],[0,35591,200])
 
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
 #B.asignacion()
+#C.asignacion()
 
 #Estructura de datos por si a caso.
 #De echo la usaremos para revisar detectar colisiones entre cualquier cuerpo.
-all_bodies = [A,B]
+all_bodies = [A,B,C]
 
 #Definimos el potencial al inicio.
-U0 = potencial(all_bodies,0)
+#U0 = potencial(all_bodies,0)
 
 #########################input and resolve parameters###########################
 
@@ -250,41 +275,76 @@ count = 0
 #Escribimos la primeras posiciones, velocidades, etc. En lugar de un vector
 #de fuerza debería calcular una matriz de todos los vectores de fuerza
 #para cada par única de interacciones y luego invertirlo para la
-#interacción opuesta (F(A-B) = -F(B-A)). Tendría la forma;
+#interacción opuesta (F(A-B) = -F(B-A)). El primer objeto es el que
+#siente la fuerza. A.fuerza(B) sería la primera hilera, segunda columna.
+#Tiene la forma:
+
 #F   A    B    C    D   ...   m
 
-#A   0   B-A  C-A  D-A  ...  m-A
+#A   0   A-B  A-C  A-D  ...  A-m    Fuerzas de A
 
-#B  A-B   0   C-B  D-B  ...  m-B
+#B  B-A   0   B-C  B-D  ...  B-m    Fuerzas de B
 
-#C  A-C  B-C   0   D-C  ...  m-C
+#C  C-A  C-B   0   C-D  ...  C-m    Fuerzas de C
 
-#D  A-D  B-D  C-D   0   ...  m-D
+#D  D-A  D-B  D-C   0   ...  D-m    Fuerzas de D
 
 #.  ...  ...  ...  ...  ...  ...
 
-#n  A-n  B-n  C-n  D-n  ...  m-n
+#n  n-A  n-B  n-C  n-D  ...  n-m    Fuerzas de n
 
 #Guardamos los valores iniciales (t=0).
-escribir_todo(A,B,count,0,all_bodies,U0)
-#Cambios de posición a i(t+∆t) con la F_i(t).
-F = A.fuerza(B)
-#F2 es la fuerza opuesta a F y la que es aplicada el segundo objeto.
-F2 = [0,0,0]
-for i in range(0,3):
-    A.pos[i] = A.pos[i] + A.vel[i]*delta + (math.pow(delta,2)*F[i]/A.masa)/2
-    F2[i] = -F[i]
-for i in range(0,3):
-    B.pos[i] = B.pos[i] + B.vel[i]*delta + (math.pow(delta,2)*F2[i]/B.masa)/2
-#Cambios de velocidad a v_i(t+∆t) con la F_i(t) y F_i(t+∆t).
-#Esta fuerza más avanzada es calculada con las nuevas posiciones i(t+∆t).
-F3 = A.fuerza(B)
-F4 = [0,0,0]
-for i in range(0,3):
-    A.vel[i] = A.vel[i] + delta*(F[i]/A.masa + F3[i]/A.masa)/2
-    F4[i] = -F2[i]
-for i in range(0,3):
-    B.vel[i] = B.vel[i] + delta*(F2[i]/B.masa + F4[i]/B.masa)/2
+escribir_todo(A,B,count,0,all_bodies,0)
+
+######Cambiemos primeras posiciones
+F = [[[0,0,0],[0,0,0],[0,0,0]],
+     [[0,0,0],[0,0,0],[0,0,0]],
+     [[0,0,0],[0,0,0],[0,0,0]]]
+#Para el cuerpo i...
+for i in range(0,len(all_bodies)):
+    #Interacción con cuerpo m.
+    for m in range(0,i):
+        if i != m:
+            h = all_bodies[i].fuerza(all_bodies[m])
+            #Dimensión k de [x,y,z] = [0,1,2].
+            for k in range(0,3):
+                F[i][m][k] = h[k]
+                F[m][i][k] = -F[i][m][k]
+#Para el cuerpo i...
+for i in range(0,len(all_bodies)):
+    #Dimensión k de [x,y,z] = [0,1,2].
+    for k in range(0,3):
+        #Interacción con cuerpo m.
+        for m in range(0,len(all_bodies)):
+            a = all_bodies[i].pos[k]
+            b = all_bodies[i].vel[k]*delta
+            c = math.pow(delta,2)*F[i][m][k]/all_bodies[i].masa
+            all_bodies[i].pos[k] = a +b + c/2
+
+######Cambiemos primeras velocidades
+F2 = [[[0,0,0],[0,0,0],[0,0,0]],
+     [[0,0,0],[0,0,0],[0,0,0]],
+     [[0,0,0],[0,0,0],[0,0,0]]]
+#Para el cuerpo i...
+for i in range(0,len(all_bodies)):
+    #Dimensión k de [x,y,z] = [0,1,2].
+    for k in range(0,i):
+        if i != k:
+            h = all_bodies[i].fuerza(all_bodies[k])
+            #Interacción con cuerpo m.
+            for m in range(0,3):
+                F2[i][k][m] = h[m]
+                F2[k][i][m] = -F2[i][k][m]
+##Efecto de las fuerzas
+#Para el cuerpo i...
+for i in range(0,len(all_bodies)):
+    #Dimensión k de [x,y,z] = [0,1,2].
+    for k in range(0,3):
+        #Interacción con cuerpo m.
+        for m in range(0,len(all_bodies)):
+            a = F[i][m][k]/all_bodies[i].masa
+            b = F2[i][m][k]/all_bodies[i].masa
+            all_bodies[i].vel[k] = all_bodies[i].vel[k] + delta*(a + b)/2
 
 #Cambiamos el tiempo porque ya se calcularon las primeras
 #coordenadas/velocidades después del inicio.
@@ -309,41 +369,56 @@ while count <= time:
     #Corregir desviaciones del tiempo actual por las decimales de ∆t.
     count = round(count,decimals)
 
-    #Velocidad intermedia (v(t+0.5*∆t)). Solo se usa para la posición nueva.
-    F = A.fuerza(B)
-    #Creamos una lista que se pueda invertir.
-    F2 = [0,0,0]
-    for i in range(0,3):
-        F2[i] = F[i]
+
+    F = [[[0,0,0],[0,0,0],[0,0,0]],
+         [[0,0,0],[0,0,0],[0,0,0]],
+         [[0,0,0],[0,0,0],[0,0,0]]]
+    #Calcularemos el tensor de fuerzas.
+    for i in range(0,len(all_bodies)):
+        for k in range(0,i):
+            if i != k:
+                h = all_bodies[i].fuerza(all_bodies[k])
+                for m in range(0,3):
+                    F[i][k][m] = h[m]
+                    F[k][i][m] = -F[i][k][m]
+    ######Velocidad intermedia (v(t+0.5*∆t)). Solo se usa para la posición nueva.
+    #Para el cuerpo i...
+    for i in range(0,len(all_bodies)):
+        #Dimensión k de [x,y,z] = [0,1,2].
+        for k in range(0,3):
+            #Interacción con cuerpo m.
+            for m in range(0,len(all_bodies)):
+                all_bodies[i].vel[k] = all_bodies[i].vel[k]
+                + delta*(F2[i][m][k]/all_bodies[i].masa)/2
+
+    ######Posición nueva en base a la velocidad intermedia (de hace media ∆t).
     for i in range(0,len(all_bodies)):
         for k in range(0,3):
-            all_bodies[i].vel[k] = all_bodies[i].vel[k]
-            + delta*(F2[k]/all_bodies[i].masa)/2
-            #Fuerzas invertidas para el siguiente objeto.
-            F2[k] = -F2[k]
+            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) + delta*(all_bodies[i].vel[k])
 
-    #Posición nueva en base a la velocidad intermedia (de hace media ∆t).
+
+    F = [[[0,0,0],[0,0,0],[0,0,0]],
+         [[0,0,0],[0,0,0],[0,0,0]],
+         [[0,0,0],[0,0,0],[0,0,0]]]
+    #Calcularemos el tensor de fuerzas.
     for i in range(0,len(all_bodies)):
-        for k in range(0,3):
-            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) +
-            delta*(all_bodies[i].vel[k])
-
-    #Ahora sí obtenemos la velocidad que corresponde al tiempo actual
-    #con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
-    F = A.fuerza(B)
-    F2 = [0,0,0]
-    for i in range(0,3):
-        F2[i] = F[i]
+        for k in range(0,i):
+            if i != k:
+                h = all_bodies[i].fuerza(all_bodies[k])
+                for m in range(0,3):
+                    F[i][k][m] = h[m]
+                    F[k][i][m] = -F[i][k][m]
+    #######Ahora sí obtenemos la velocidad que corresponde al tiempo actual
+    #######con la aceleración y posición nuevas (v(t+∆t)=v(t+0.5*∆t)+a(i(t+∆t))).
+    #Para el cuerpo i...
     for i in range(0,len(all_bodies)):
+        #Dimensión k de [x,y,z] = [0,1,2].
         for k in range(0,3):
-            #Por alguna razón si pongo estas expresiones en la ecuación de
-            #forma directa me lee un error de syntax.
-            a = all_bodies[i].vel[k]
-            b = 0.5*delta*(F2[k]/all_bodies[i].masa)
-            all_bodies[i].vel[k] = a + b
-            #Fuerzas invertidas para el siguiente objeto.
-            F2[k] = -F2[k]
-
+            #Interacción con cuerpo m.
+            for m in range(0,len(all_bodies)):
+                a = all_bodies[i].vel[k]
+                b = 0.5*delta*(F[i][m][k]/all_bodies[i].masa)
+                all_bodies[i].vel[k] = a + b
 
     #Revisamos el case de colisiones antes de guardar las posiciones y
     #demás variables ya que no serán  posibles si ocurrió una colisión.
@@ -357,7 +432,18 @@ while count <= time:
     #a pos/vel(t+∆t). Quizás tenga que volver a guardar 'todo'
     #después de la última iteración, fuera del loop.
     if remover%frecuencia == 0:
-        escribir_todo(A,B,count,delta,all_bodies,U0)
+        escribir_todo(A,B,count,delta,all_bodies,0)
+        a = F[2][0][0]
+        b = F[2][0][1]
+        c = F[2][0][2]
+        d = math.sqrt(math.pow(a,2) + math.pow(b,2) + math.pow(c,2))
+        f3_1.append([count,a,b,c,d])
+
+        a = F[2][1][0]
+        b = F[2][1][1]
+        c = F[2][1][2]
+        d = math.sqrt(math.pow(a,2) + math.pow(b,2) + math.pow(c,2))
+        f3_2.append([count,a,b,c,d])
     #Increase counters.
     remover = remover + 1
     count = count + delta
@@ -391,12 +477,18 @@ else:
 #Para cambir el output location
 #print("File path:") path = input() path = path + "/" + "coordenadas1.csv"
 ##Convertir las listas en DataFrames para convertirlos en archivos .csv
+#Posiciones
 dataframe1 = pd.DataFrame(co1, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
 print(dataframe1)
 dataframe1.to_csv('/Users/santi/Desktop/Execution environment/coordenadas1.csv', index = None)
 dataframe2 = pd.DataFrame(co2, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
 print(dataframe2)
 dataframe2.to_csv('/Users/santi/Desktop/Execution environment/coordenadas2.csv', index = None)
+dataframe15 = pd.DataFrame(co3, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+print(dataframe15)
+dataframe15.to_csv('/Users/santi/Desktop/Execution environment/coordenadas3.csv', index = None)
+
+#Coordenadas del Sol
 dataframe3 = pd.DataFrame(vx1, columns = ['t (s)', 'Vx (m/s)'])
 print(dataframe3)
 dataframe3.to_csv('/Users/santi/Desktop/Execution environment/vx1.csv', index = None)
@@ -406,6 +498,8 @@ dataframe4.to_csv('/Users/santi/Desktop/Execution environment/vy1.csv', index = 
 dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vz (m/s)'])
 print(dataframe5)
 dataframe5.to_csv('/Users/santi/Desktop/Execution environment/vz1.csv', index = None)
+
+#Coordenadas de Jupiter
 dataframe6 = pd.DataFrame(vx2, columns = ['t (s)', 'Vx (m/s)'])
 print(dataframe6)
 dataframe6.to_csv('/Users/santi/Desktop/Execution environment/vx2.csv', index = None)
@@ -415,12 +509,34 @@ dataframe7.to_csv('/Users/santi/Desktop/Execution environment/vy2.csv', index = 
 dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vz (m/s)'])
 print(dataframe8)
 dataframe8.to_csv('/Users/santi/Desktop/Execution environment/vz2.csv', index = None)
+
+#Coordenadas del asteroide
+dataframe16 = pd.DataFrame(vx3, columns = ['t (s)', 'Vx (m/s)'])
+print(dataframe16)
+dataframe16.to_csv('/Users/santi/Desktop/Execution environment/vx3.csv', index = None)
+dataframe17 = pd.DataFrame(vy3, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe17)
+dataframe17.to_csv('/Users/santi/Desktop/Execution environment/vy3.csv', index = None)
+dataframe18 = pd.DataFrame(vz3, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe18)
+dataframe18.to_csv('/Users/santi/Desktop/Execution environment/vz3.csv', index = None)
+
+dataframe19 = pd.DataFrame(f3_1, columns = ['t (s)', 'Fx', 'Fy', 'Fz', 'F (N)'])
+print(dataframe19)
+dataframe19.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_sol.csv', index = None)
+dataframe20 = pd.DataFrame(f3_2, columns = ['t (s)', 'Fx', 'Fy', 'Fz', 'F(N) '])
+print(dataframe20)
+dataframe20.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_jupiter.csv', index = None)
+
+#Energías del sistema
 dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'T (J)'])
 print(dataframe9)
 dataframe9.to_csv('/Users/santi/Desktop/Execution environment/cinetica.csv', index = None)
 dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
 print(dataframe10)
 dataframe10.to_csv('/Users/santi/Desktop/Execution environment/potencial.csv', index = None)
+
+#Momentos lineales del sistema
 dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
 print(dataframe11)
 dataframe11.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal.csv', index = None)
