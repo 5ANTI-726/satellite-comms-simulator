@@ -35,8 +35,17 @@ vx3 = []
 vy3 = []
 vz3 = []
 
+f1 = []
+
+f2 = []
+
+f3 = []
+
 f3_1 = []
 f3_2 = []
+
+peri=[0,0]
+
 
 #Energías
 e_cinetica = []
@@ -226,14 +235,14 @@ class Cuerpo:
         return(d)
 
 #(nombre, radio, masa, posición [x,y,z], velocidad [vx,vy,vz])
-A = Cuerpo('Sol',696.34*math.pow(10,6),1.989*math.pow(10,30),
-[0,0,0],[0,0,200])
+A = Cuerpo('Sol',696.34*math.pow(10,6),1.9885*math.pow(10,30),
+[0,0,0],[0,0,0])
 B = Cuerpo('Júpiter',69.911*math.pow(10,6),1.898*math.pow(10,27),
-[755.23*math.pow(10,9),0,0],[0,10000,200])
+[701.337*math.pow(10,9),237.789*math.pow(10,9),0],[-3867,7800,0])
 #Densidad típica de 4 g/cm, radio de 500 metros y masa de
 #2.094*math.pow(10,12) kg
 C = Cuerpo('Asteroide',500,2.094*math.pow(10,12),
-[755.33*math.pow(10,9),0,0],[0,35591,200])
+[-580.522*math.pow(10,9),520*math.pow(10,9),0],[6280.5,-9958.0,0])
 
 #Activar para asignar parámetros. Si no, dejar valores existentes.
 #A.asignacion()
@@ -254,13 +263,16 @@ print('****************************************************************')
 #Get the number of points wanted which will be used in the modulo conditional
 #so as to only record data in the .txt files a limited number of times
 #for even the largest trajectories.
-points = float(input('Número de puntos guardados: '))
+#points = float(input('Número de puntos guardados: '))
+points = 4000
 
 #Resolution of calculations (∆t).
-delta = float(input('Resolución de tiempo: '))
+#delta = float(input('Resolución de tiempo: '))
+delta = 250
 
 #Simulation length in seconds. Antes se llamaba resolution.
-time = float(input('Tiempo de simulación: '))
+#time = float(input('Tiempo de simulación: '))
+time = 175000000
 
 #Establishing stores for the error (crash) variable that inidicates
 #if a crash ocurred, the frequency of writing down coordinates in terms
@@ -310,6 +322,8 @@ for i in range(0,len(all_bodies)):
             for k in range(0,3):
                 F[i][m][k] = h[k]
                 F[m][i][k] = -F[i][m][k]
+print("Initial forces: ")
+print(F)
 #Para el cuerpo i...
 for i in range(0,len(all_bodies)):
     #Dimensión k de [x,y,z] = [0,1,2].
@@ -394,7 +408,8 @@ while count <= time:
     ######Posición nueva en base a la velocidad intermedia (de hace media ∆t).
     for i in range(0,len(all_bodies)):
         for k in range(0,3):
-            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) + delta*(all_bodies[i].vel[k])
+            all_bodies[i].pos[k] = (all_bodies[i].pos[k]) +
+            delta*(all_bodies[i].vel[k])
 
 
     F = [[[0,0,0],[0,0,0],[0,0,0]],
@@ -444,6 +459,22 @@ while count <= time:
         c = F[2][1][2]
         d = math.sqrt(math.pow(a,2) + math.pow(b,2) + math.pow(c,2))
         f3_2.append([count,a,b,c,d])
+
+        x = F[0][1][0] + F[0][2][0]
+        y = F[0][1][1] + F[0][2][1]
+        z = F[0][1][2] + F[0][2][2]
+        f1.append([count,math.sqrt(math.pow(x,2)+math.pow(y,2)+math.pow(z,2))])
+
+        x = F[1][0][0] + F[1][2][0]
+        y = F[1][0][1] + F[1][2][1]
+        z = F[1][0][2] + F[1][2][2]
+        f2.append([count,math.sqrt(math.pow(x,2)+math.pow(y,2)+math.pow(z,2))])
+
+        x = F[2][0][0] + F[2][1][0]
+        y = F[2][0][1] + F[2][1][1]
+        z = F[2][0][2] + F[2][1][2]
+        f3.append([count,math.sqrt(math.pow(x,2)+math.pow(y,2)+math.pow(z,2))])
+
     #Increase counters.
     remover = remover + 1
     count = count + delta
@@ -457,8 +488,137 @@ while count <= time:
 ####B(r = 0.05,pos[-1,0,0,vel[0,0,0])
 ####y revisar los archivos para revisar choque. Debe de ocurrir
 ####con las posiciones finales [-0.05,0,0] y [0.05,0,0]######
+x = co2[i][1]-co3[i][1]
+y = co2[i][2]-co3[i][2]
+z = co2[i][3]-co3[i][3]
+d = math.sqrt(math.pow(x,2)+math.pow(y,2)+math.pow(z,2))
+peri[0] = d
+peri[1] = 0
+for i in range(0,len(co2)):
+    x = co2[i][0]-co3[i][0]
+    y = co2[i][1]-co3[i][1]
+    z = co2[i][2]-co3[i][2]
+    d = math.sqrt(math.pow(x,2)+math.pow(y,2)+math.pow(z,2))
+    if peri[0] >= d:
+        if x >= 0:
+            peri[0] = d
+            peri[1] = co2[i][3]
+        else:
+            peri[0] = -d
+            peri[1] = co2[i][3]
+
 
 #################################text-based UI##################################
+#Para cambir el output location
+#print("File path:") path = input() path = path + "/" + "coordenadas1.csv"
+##Convertir las listas en DataFrames para convertirlos en archivos .csv
+#Posiciones
+dataframe1 = pd.DataFrame(co1, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+print(dataframe1)
+dataframe1.to_csv('/Users/santi/Desktop/Execution environment/coordenadas1.csv',
+index = None)
+dataframe2 = pd.DataFrame(co2, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+print(dataframe2)
+dataframe2.to_csv('/Users/santi/Desktop/Execution environment/coordenadas2.csv',
+index = None)
+dataframe15 = pd.DataFrame(co3, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
+print(dataframe15)
+dataframe15.to_csv('/Users/santi/Desktop/Execution environment/coordenadas3.csv',
+index = None)
+
+#Coordenadas del Sol
+dataframe3 = pd.DataFrame(vx1, columns = ['t (s)', 'Vx (m/s)'])
+print(dataframe3)
+dataframe3.to_csv('/Users/santi/Desktop/Execution environment/vx1.csv',
+index = None)
+dataframe4 = pd.DataFrame(vy1, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe4)
+dataframe4.to_csv('/Users/santi/Desktop/Execution environment/vy1.csv',
+index = None)
+dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe5)
+dataframe5.to_csv('/Users/santi/Desktop/Execution environment/vz1.csv',
+index = None)
+
+#Coordenadas de Jupiter
+dataframe6 = pd.DataFrame(vx2, columns = ['t (s)', 'Vx (m/s)'])
+print(dataframe6)
+dataframe6.to_csv('/Users/santi/Desktop/Execution environment/vx2.csv',
+index = None)
+dataframe7 = pd.DataFrame(vy2, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe7)
+dataframe7.to_csv('/Users/santi/Desktop/Execution environment/vy2.csv',
+index = None)
+dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe8)
+dataframe8.to_csv('/Users/santi/Desktop/Execution environment/vz2.csv',
+index = None)
+
+#Coordenadas del asteroide
+dataframe16 = pd.DataFrame(vx3, columns = ['t (s)', 'Vx (m/s)'])
+print(dataframe16)
+dataframe16.to_csv('/Users/santi/Desktop/Execution environment/vx3.csv',
+index = None)
+dataframe17 = pd.DataFrame(vy3, columns = ['t (s)', 'Vy (m/s)'])
+print(dataframe17)
+dataframe17.to_csv('/Users/santi/Desktop/Execution environment/vy3.csv',
+index = None)
+dataframe18 = pd.DataFrame(vz3, columns = ['t (s)', 'Vz (m/s)'])
+print(dataframe18)
+dataframe18.to_csv('/Users/santi/Desktop/Execution environment/vz3.csv',
+index = None)
+
+dataframe19 = pd.DataFrame(f3_1, columns =
+['t (s)', 'Fx', 'Fy', 'Fz', 'F (N)'])
+print(dataframe19)
+dataframe19.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_sol.csv',
+index = None)
+dataframe20 = pd.DataFrame(f3_2, columns = ['t (s)', 'Fx', 'Fy', 'Fz', 'F(N) '])
+print(dataframe20)
+dataframe20.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_jupiter.csv',
+index = None)
+
+dataframe21 = pd.DataFrame(f1, columns = ['t (s)','F (N)'])
+print(dataframe21)
+dataframe21.to_csv('/Users/santi/Desktop/Execution environment/f_sol.csv',
+index = None)
+dataframe22 = pd.DataFrame(f2, columns = ['t (s)', 'F(N) '])
+print(dataframe22)
+dataframe22.to_csv('/Users/santi/Desktop/Execution environment/f_jupiter.csv',
+index = None)
+dataframe23 = pd.DataFrame(f3, columns = ['t (s)', 'F (N)'])
+print(dataframe23)
+dataframe23.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide.csv',
+index = None)
+
+#Energías del sistema
+dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'T (J)'])
+print(dataframe9)
+dataframe9.to_csv('/Users/santi/Desktop/Execution environment/cinetica.csv',
+index = None)
+dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
+print(dataframe10)
+dataframe10.to_csv('/Users/santi/Desktop/Execution environment/potencial.csv',
+index = None)
+
+#Momentos lineales del sistema
+dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
+print(dataframe11)
+dataframe11.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal.csv',
+index = None)
+dataframe12 = pd.DataFrame(Px, columns = ['t (s)', 'Px (kg*m/s)'])
+print(dataframe12)
+dataframe12.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_x.csv',
+index = None)
+dataframe13 = pd.DataFrame(Py, columns = ['t (s)', 'Py (kg*m/s)'])
+print(dataframe13)
+dataframe13.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_y.csv',
+index = None)
+dataframe14 = pd.DataFrame(Pz, columns = ['t (s)', 'Pz (kg*m/s)'])
+print(dataframe14)
+dataframe14.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_z.csv',
+index = None)
+
 #If there was no crash with the planet...
 if error == False:
 
@@ -474,78 +634,6 @@ else:
     print("Your trajectory was deffective in accuracy")
     print("Crashed after: " + str(count) + " seconds.")
     print("****************************************************************")
-#Para cambir el output location
-#print("File path:") path = input() path = path + "/" + "coordenadas1.csv"
-##Convertir las listas en DataFrames para convertirlos en archivos .csv
-#Posiciones
-dataframe1 = pd.DataFrame(co1, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
-print(dataframe1)
-dataframe1.to_csv('/Users/santi/Desktop/Execution environment/coordenadas1.csv', index = None)
-dataframe2 = pd.DataFrame(co2, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
-print(dataframe2)
-dataframe2.to_csv('/Users/santi/Desktop/Execution environment/coordenadas2.csv', index = None)
-dataframe15 = pd.DataFrame(co3, columns = ['X (m)', 'Y (m)', 'Z (m)', 't (s)'])
-print(dataframe15)
-dataframe15.to_csv('/Users/santi/Desktop/Execution environment/coordenadas3.csv', index = None)
 
-#Coordenadas del Sol
-dataframe3 = pd.DataFrame(vx1, columns = ['t (s)', 'Vx (m/s)'])
-print(dataframe3)
-dataframe3.to_csv('/Users/santi/Desktop/Execution environment/vx1.csv', index = None)
-dataframe4 = pd.DataFrame(vy1, columns = ['t (s)', 'Vy (m/s)'])
-print(dataframe4)
-dataframe4.to_csv('/Users/santi/Desktop/Execution environment/vy1.csv', index = None)
-dataframe5 = pd.DataFrame(vz1, columns = ['t (s)', 'Vz (m/s)'])
-print(dataframe5)
-dataframe5.to_csv('/Users/santi/Desktop/Execution environment/vz1.csv', index = None)
-
-#Coordenadas de Jupiter
-dataframe6 = pd.DataFrame(vx2, columns = ['t (s)', 'Vx (m/s)'])
-print(dataframe6)
-dataframe6.to_csv('/Users/santi/Desktop/Execution environment/vx2.csv', index = None)
-dataframe7 = pd.DataFrame(vy2, columns = ['t (s)', 'Vy (m/s)'])
-print(dataframe7)
-dataframe7.to_csv('/Users/santi/Desktop/Execution environment/vy2.csv', index = None)
-dataframe8 = pd.DataFrame(vz2, columns = ['t (s)', 'Vz (m/s)'])
-print(dataframe8)
-dataframe8.to_csv('/Users/santi/Desktop/Execution environment/vz2.csv', index = None)
-
-#Coordenadas del asteroide
-dataframe16 = pd.DataFrame(vx3, columns = ['t (s)', 'Vx (m/s)'])
-print(dataframe16)
-dataframe16.to_csv('/Users/santi/Desktop/Execution environment/vx3.csv', index = None)
-dataframe17 = pd.DataFrame(vy3, columns = ['t (s)', 'Vy (m/s)'])
-print(dataframe17)
-dataframe17.to_csv('/Users/santi/Desktop/Execution environment/vy3.csv', index = None)
-dataframe18 = pd.DataFrame(vz3, columns = ['t (s)', 'Vz (m/s)'])
-print(dataframe18)
-dataframe18.to_csv('/Users/santi/Desktop/Execution environment/vz3.csv', index = None)
-
-dataframe19 = pd.DataFrame(f3_1, columns = ['t (s)', 'Fx', 'Fy', 'Fz', 'F (N)'])
-print(dataframe19)
-dataframe19.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_sol.csv', index = None)
-dataframe20 = pd.DataFrame(f3_2, columns = ['t (s)', 'Fx', 'Fy', 'Fz', 'F(N) '])
-print(dataframe20)
-dataframe20.to_csv('/Users/santi/Desktop/Execution environment/f_asteroide_jupiter.csv', index = None)
-
-#Energías del sistema
-dataframe9 = pd.DataFrame(e_cinetica, columns = ['t (s)', 'T (J)'])
-print(dataframe9)
-dataframe9.to_csv('/Users/santi/Desktop/Execution environment/cinetica.csv', index = None)
-dataframe10 = pd.DataFrame(e_potencial, columns = ['t (s)', 'U (J)'])
-print(dataframe10)
-dataframe10.to_csv('/Users/santi/Desktop/Execution environment/potencial.csv', index = None)
-
-#Momentos lineales del sistema
-dataframe11 = pd.DataFrame(P, columns = ['t (s)', 'P (kg*m/s)'])
-print(dataframe11)
-dataframe11.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal.csv', index = None)
-dataframe12 = pd.DataFrame(Px, columns = ['t (s)', 'Px (kg*m/s)'])
-print(dataframe12)
-dataframe12.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_x.csv', index = None)
-dataframe13 = pd.DataFrame(Py, columns = ['t (s)', 'Py (kg*m/s)'])
-print(dataframe13)
-dataframe13.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_y.csv', index = None)
-dataframe14 = pd.DataFrame(Pz, columns = ['t (s)', 'Pz (kg*m/s)'])
-print(dataframe14)
-dataframe14.to_csv('/Users/santi/Desktop/Execution environment/momento_lineal_z.csv', index = None)
+print("D: " + str(peri[0]))
+print("T: " + str(peri[1]))
